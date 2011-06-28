@@ -1,0 +1,12 @@
+{
+  "name"          : "diretto-util",
+  "description"   : "node.js utilities for diretto",
+  "url"           : "http://www.diretto.org",
+  "keywords"      : ["diretto"],
+  "author"        : "Benjamin Erb",
+  "contributors"  : [],
+  "dependencies"  : [],
+  "lib"           : ".",
+  "main"          : "./util.js",
+  "version"       : "0.1.0"
+}

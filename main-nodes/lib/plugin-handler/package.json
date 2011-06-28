@@ -1,0 +1,12 @@
+{
+  "name"          : "plugin-handler",
+  "description"   : "Plugin handler for importing modules of a certain interface",
+  "url"           : "http://www.diretto.org",
+  "keywords"      : ["diretto"],
+  "author"        : "Benjamin Erb",
+  "contributors"  : [],
+  "dependencies"  : [],
+  "lib"           : ".",
+  "main"          : "./plugin-handler.js",
+  "version"       : "0.1.0"
+}

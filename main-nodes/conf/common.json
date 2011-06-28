@@ -1,0 +1,15 @@
+{
+	"endpoints": {
+		"api" : "http://api.diretto.org",
+		"feed" : "http://feed.diretto.org",
+		"media" : "http://media.diretto.org"
+	},
+	"security" : {
+		"salt" : "6K5817EXZ21TYBVFYGVA"
+	},
+    "deployment": {
+    	"title":"diretto v2 Dev",
+    	"website":"http://www.diretto.org",
+    	"contact":"mail@diretto.org"
+    }	
+} 

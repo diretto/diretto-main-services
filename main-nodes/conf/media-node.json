@@ -1,0 +1,12 @@
+{
+	"bind" : {
+		"ip" : "127.0.0.1", 
+		"port" : "8000"
+	},
+	"storage" : {
+		"backend" : "media-node-fs-backend"
+	},
+	"auth" : {
+		"plugin" : "auth-basic-dummy"
+	} 
+}
