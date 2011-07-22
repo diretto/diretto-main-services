@@ -1,3 +1,3 @@
 exports.config = {
-		rootDir : "/home/benjamin/tmp/"
+		rootDir : "/uni/tmp-diretto/"
 };

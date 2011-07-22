@@ -1,8 +1,8 @@
 {
 	"endpoints": {
-		"api" : "http://api.diretto.org",
-		"feed" : "http://feed.diretto.org",
-		"media" : "http://media.diretto.org"
+		"core" : "http://api.diretto.org/v2",
+		"feed" : "http://feed.diretto.org/v2",
+		"storage" : "http://media.diretto.org/v2"
 	},
 	"security" : {
 		"salt" : "6K5817EXZ21TYBVFYGVA"
