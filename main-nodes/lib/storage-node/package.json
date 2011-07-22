@@ -1,0 +1,12 @@
+{
+  "name"          : "storage-node",
+  "description"   : "node.js library for diretto Storage API Implmentation",
+  "url"           : "http://www.diretto.org",
+  "keywords"      : ["diretto"],
+  "author"        : "Benjamin Erb",
+  "contributors"  : [],
+  "dependencies"  : [],
+  "lib"           : ".",
+  "main"          : "./storage-node.js",
+  "version"       : "0.1.0"
+}
