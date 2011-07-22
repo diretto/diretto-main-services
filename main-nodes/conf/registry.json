@@ -1,0 +1,3 @@
+{
+	"services" : ["http://task.diretto.org/v2/","http://localhost:8006/v2/"]
+}
