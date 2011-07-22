@@ -17,7 +17,7 @@ exports.Plugin = {
 
 	name : "Filesystem Storage Backend",
 
-	id : "media-node-fs-backend",
+	id : "storage-node-fs-backend",
 
 	init : function(options) {
 		console.log("Initializing " + this.name);

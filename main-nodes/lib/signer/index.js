@@ -13,8 +13,9 @@ module.exports = function(salt) {
 
 	var DELIMITER = ":";
 
-	var signRequest = function(method, username, path, length, mimetype, callback) {
-		var s = method + DELIMITER + username + DELIMITER + path + DELIMITER + length + DELIMITER + mimetype;
+	var signRequest = function(username, path, length, mimetype, callback) {
+		var s = username + DELIMITER + path + DELIMITER + length + DELIMITER + mimetype;
+		console.log(s);
 		var hmac = crypto.createHmac("sha1", salt);
 		hmac.update(s);
 		var result = hmac.digest('hex');

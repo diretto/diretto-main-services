@@ -25,7 +25,7 @@ exports.Plugin = {
 
 	name : "OpenStack Object Storage (Swift) Backend",
 
-	id : "media-node-swift-backend",
+	id : "storage-node-swift-backend",
 
 	init : function(options) {
 		

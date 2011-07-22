@@ -22,7 +22,7 @@ exports.Plugin = {
 
 	name : "CouchDB Storage Backend",
 
-	id : "media-node-couchdb-backend",
+	id : "storage-node-couchdb-backend",
 
 	init : function(options) {
 		console.log("Initializing " + this.name);

@@ -4,7 +4,8 @@
 		"port" : "8000"
 	},
 	"storage" : {
-		"backend" : "media-node-fs-backend"
+		"backend" : "storage-node-fs-backend",
+		"tmpDir" : "/tmp/"
 	},
 	"auth" : {
 		"plugin" : "auth-basic-dummy"

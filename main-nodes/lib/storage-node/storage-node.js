@@ -2,6 +2,9 @@ var path = require('path');
 var util = require('util');
 var http = require('http');
 var url = require('url');
+var fs= require('fs');
+
+var formidable = require('formidable');
 
 var PluginHandler = require('plugin-handler').PluginHandler;
 var direttoUtil = require('diretto-util');
@@ -40,14 +43,13 @@ module.exports = function(options) {
 
 	var signer = Signer(options.common.security.salt);
 
-//	signer.signRequest("PUT", "xx", "/b54adc00-67f9-11d9-9669-0800200c9a66/b54adc00-67f9-11d9-9669-0800200c9a66.jpg", 8313, "image/jpeg", function(e, token) {
-//	console.log(token);
-//});
+	signer.signRequest("xx", "/0ecb3c6f-9ed9-41d0-ae40-ea074aeb1786/b54adc00-67f9-11d9-9669-0800200c9a66.jpg", 8313, "image/jpeg", function(e, token) {
+		console.log(token);
+	});
 
-//	signer.signResponse(201, "xx", "/b54adc00-67f9-11d9-9669-0800200c9a66/b54adc00-67f9-11d9-9669-0800200c9a66.jpg", function(e, token) {
-//	console.log(token);
-//	});
-
+	signer.signResponse(201, "xx", "/0ecb3c6f-9ed9-41d0-ae40-ea074aeb1786/b54adc00-67f9-11d9-9669-0800200c9a66.jpg", function(e, token) {
+		console.log(token);
+	});
 
 	// Stringify once
 	var indexResource = JSON.stringify({
@@ -181,7 +183,7 @@ module.exports = function(options) {
 								}
 								else {
 									if (request.headers['content-length'] && request.headers['content-type']) {
-										signer.signRequest('PUT', user, requestUrl.pathname, request.headers['content-length'], request.headers['content-type'], function(err, expectedToken) {
+										signer.signRequest(user, requestUrl.pathname, request.headers['content-length'], request.headers['content-type'], function(err, expectedToken) {
 											if (err) {
 												response.write(_errorJSON(err && err.reason || ""));
 												response.end();
@@ -245,15 +247,120 @@ module.exports = function(options) {
 
 					default:
 						response.writeHead(405, headers);
-						res.end();
+						response.end();
 						break;
 				}
 				;
 			}
 			else {
-				response.writeHead(400, headers);
-				response.write(_errorJSON("Invalid request."));
-				response.end();
+				switch (request.method) {
+					case 'POST':
+						auth.authenticate(request, function(err, user) {
+							if (err) {
+								if (err.code && err.code === 401) {
+									headers['WWW-Authenticate'] = 'Basic realm=diretto Media Node Access';
+								}
+								response.writeHead(err.code || 401, headers);
+								response.write(_errorJSON(err.reason));
+								response.end();
+							}
+							else {
+								var form = new formidable.IncomingForm();
+								var files = []; 
+								var fields = {};
+								
+								var cleanup = function(){
+									files.forEach(function(file){
+										if(file[1].path){
+											fs.unlink(file[1].path);
+											console.log("deleting " +file[1].path );
+										}
+									});
+								};
+								
+								var abort = function(code, msg){
+									response.writeHead(code || 400, headers);
+									response.write(_errorJSON(msg || "Invalid upload"));
+									response.end();
+								};
+
+								form.uploadDir = options.storage.storage.tmpDir;
+
+								form.on('field', function(field, value) {
+									fields[field] = value;
+								}).on('file', function(field, file) {
+									files.push([ field, file ]);
+								}).on('end', function() {
+									
+									//1 file? token and file?
+									if(!fields.token || !fields.filename || files.length !== 1){
+										abort();
+										cleanup();
+									}
+									
+									//check sign
+									signer.signRequest(user, "/"+documentId+"/"+fields.filename, files[0][1].length, files[0][1].mime,function(err,token){
+										console.dir(files);
+										console.log("expected: " +token);
+										console.log("got: " +fields.token);
+										if(token === fields.token){
+											
+											var readStream = fs.createReadStream(files[0][1].path);
+											readStream.once('open', function(fd){
+												
+												var attachmentExt = path.extname(fields.filename) || "";
+												
+												var attachmentId = path.basename(fields.filename, attachmentExt);
+												
+												var e = backend.put(documentId, attachmentId, attachmentExt, files[0][1].mime || "application/octet",
+														files[0][1].length, readStream);
+												e.once('error', function(err) {
+													if (err && err.reason && err.reason === "conflict") {
+														response.writeHead(409, headers);
+													}
+													else {
+														response.writeHead(500, headers);
+													}
+													response.write(_errorJSON(err && err.reason || ""));
+													response.end();
+													cleanup();
+												});
+												e.once('success', function() {
+													headers['content-type'] = "application/json";
+													response.writeHead(201, headers);
+													signer.signResponse(201, user, requestUrl.pathname, function(err, token) {
+														if (err) {
+															response.write("{\"error\":\"internal\"}");
+															response.end();
+														}
+														else {
+															response.write("{\"successToken\":\"" + token + "\"}");
+															response.end();
+														}
+
+													});
+													cleanup();
+												});
+											});
+										}
+										else{
+											abort(403, "invalid token");
+											cleanup();
+										}
+										
+									});
+								});
+								form.parse(request);
+							}
+						});
+
+						break;
+
+					default:
+						response.writeHead(405, headers);
+						response.end();
+						break;
+				}
 			}
 		}
 		else if (requestUrl.pathname === "/") {
