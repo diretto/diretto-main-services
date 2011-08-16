@@ -1,0 +1,36 @@
+{
+  "name": "restify",
+  "description": "REST framework specifically meant for web service APIs",
+  "version": "0.2.7",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mcavage/node-restify.git"
+  },
+  "author": "Mark Cavage <mcavage@gmail.com> (http://www.joyent.com)",
+  "main": "lib/restify.js",
+  "dependencies": {
+    "formidable": ">=1.0.2",
+    "httpu": ">=0.0.1",
+    "node-uuid": ">=1.1.0",
+    "retry": ">=0.4.0"
+  },
+  "scripts": {
+    "pretest": "./node_modules/.bin/jshint lib tst",
+    "test": "./node_modules/.bin/whiskey --timeout 2000 -t \"`find tst -name *.test.js | xargs`\""
+  },
+  "man": [
+    "./docs/restify.3",
+    "./docs/restify-log.7",
+    "./docs/restify-request.7",
+    "./docs/restify-response.7",
+    "./docs/restify-routes.7"
+  ],
+  "devDependencies": {
+    "jshint": ">=0.2.1",
+    "node-uuid": ">=1.2.0",
+    "whiskey": ">=0.3.3"
+  },
+  "engines": {
+    "node": ">=0.4.0"
+  }
+}

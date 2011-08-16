@@ -15,6 +15,9 @@ module.exports = function(services, callback) {
 	var supportedAPIs = {
 		"org.diretto.api.external.task" : {
 			"v2" : true
+		},
+		"org.diretto.api.main.storage" : {
+			"v2" : true
 		}
 	};
 
