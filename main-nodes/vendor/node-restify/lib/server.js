@@ -90,7 +90,7 @@ function _matches(path, route) {
 
 
 function _parseAccept(request, response) {
-	console.dir(request.headers);
+//	console.dir(request.headers);
   response._accept = 'application/json';
   var accept = null;
 

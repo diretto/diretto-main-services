@@ -40,7 +40,7 @@ module.exports = function(h) {
 	};
 	
 	/**
-	 * 
+	 * Takes a list of request user URIs and divides them into syntactically valid and invalid groups.
 	 */
 	var validateUserList = function(data, response, next, callback) {
 		var fail = function(msg) {
@@ -58,14 +58,16 @@ module.exports = function(h) {
 		var invalidUris = [];
 		
 		data.users.forEach(function(userUri) {
-			// TODO: check URI
-			var parts = userUri.split("/");
-			if(parts.length > 4){
-				validIds.push(""+parts[parts.length-1]);
+			var baseUri = h.util.uri.baseUri();
+			if(userUri.length > baseUri.length && baseUri === userUri.substring(0, baseUri.length)){
+				var parts = userUri.substr(baseUri.length).split('/');
+				console.dir(parts);
+				if (parts.length > 2 && parts[1] === 'user'){
+					validIds.push(parts[2]);
+					return;
+				}
 			}
-			else{
-				invalidUris.push(userUri)
-			}
+			invalidUris.push(userUri)
 		});
 		
 		//check for max snapshots allowed
@@ -221,7 +223,6 @@ module.exports = function(h) {
 	return {
 
 		get : function(req, res, next) {
-			
 			getUserDoc(req.uriParams.userId, function(err,userDoc){
 				if(err){
 					h.responses.error(500,"Internal server error.",res,next);
@@ -230,7 +231,9 @@ module.exports = function(h) {
 					h.responses.error(404,"User not found.",res,next);
 				}
 				else{
-					res.send(200, renderResult(userDoc,req.authenticatedUser));
+					res.send(200, renderResult(userDoc,req.authenticatedUser),{
+						"ETag" : '"'+userDoc._rev+'"'
+					});
 				}
 			});
 		},
@@ -275,7 +278,7 @@ module.exports = function(h) {
 						res.send(200, {
 							results : results
 						});
-						next();
+						return next();
 					}
 				});
 			});
@@ -295,17 +298,83 @@ module.exports = function(h) {
 		},
 		
 		forwardUsers : function(req, res, next) {
-			res.send(501);
-			return next();
+			h.util.dbPaginator.forward("users/user_by_date",function(err,cursor){
+				if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else if ( cursor === null){
+					res.send(204);
+					return next();
+				}
+				else{
+					var uri = h.util.uri.userListPage(cursor);
+					res.send(303, {
+						link :  h.util.link(uri)
+					},{'Location' : uri});
+					return next();
+				}
+			});
 		},
 		
 		listUsers : function(req, res, next) {
-			res.send(501);
-			return next();
+			
+			getUserDoc(req.uriParams.cursorId, function(err,userDoc){
+				if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else if (userDoc === null){
+					h.responses.error(404,"Cursor not found.",res,next);
+				}
+				else{
+					
+					var key = [userDoc.creationTime, req.uriParams.cursorId];
+					
+					h.util.dbPaginator.getPage('users/user_by_date', key, PAGINATION_SIZE, false, function(row){
+						return {
+							key : row.key[1],
+							name : row.value
+						};
+					}, function(err, result){
+						if(err){
+							res.send(500);
+						}
+						else{
+							
+							var list = result.list.map(function(user){
+								return {
+									user : {
+										link : h.util.link(h.util.uri.user(user.key)),
+										username : user.name
+									}
+								}
+							});
+							
+							var related = [];
+							["next", "previous"].forEach(function(e){
+								if(result[e]){
+									related.push({
+										"link" : h.util.link(h.util.uri.userListPage(result[e].key), e)
+									});
+								}
+							});
+							
+							var headers = {};
+							if(result.etag){
+								headers["Etag"] = '"'+result.etag+'"';
+							}
+							
+							res.send(200, {
+								"page" : {
+									"link" : h.util.link(h.util.uri.userListPage(req.uriParams.cursorId))
+								},
+								"list" :  list,
+								"related" : related
+							},headers);
+							return next();
+						}
+					});
+				}
+			});
 		},
-		
-
-		
-
 	};
 };

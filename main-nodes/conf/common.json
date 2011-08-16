@@ -1,6 +1,6 @@
 {
 	"endpoints": {
-		"core" : "http://api.diretto.org/v2",
+		"core" : "http://localhost:8001/v2",
 		"feed" : "http://feed.diretto.org/v2",
 		"storage" : "http://media.diretto.org/v2"
 	},

@@ -12,6 +12,9 @@ module.exports = function(baseUri){
 		}	
 		else if(p.userId){
 			return  baseUri+"/user/"+p.userId;
+		}
+		else if(p.userListCursorId){
+			return  baseUri+"/users/cursor/"+p.userListCursorId;
 		}			
 		else{
 			return baseUri;
@@ -19,9 +22,17 @@ module.exports = function(baseUri){
 	};
 	
 	return {
+		baseUri : function(){
+			return baseUri;
+		},		
 		user : function(id){
 			return builder({
 				userId: id
+			});
+		},
+		userListPage :  function(id){
+			return builder({
+				userListCursorId: id
 			});
 		},
 		users : function(){

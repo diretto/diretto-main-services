@@ -72,6 +72,7 @@ module.exports = function(options) {
 			},
 			
 			dbHelper : require('./util/db-helper.js')(db),
+			dbPaginator : require('./util/db-paginator.js')(db),
 		},
 
 		db : db,
