@@ -4,7 +4,6 @@ var crypto = require('crypto');
 module.exports = function(h) {
 	
 	var BATCH_LIMIT = h.options.core.parameters.batchLimit || 50;
-	
 	var PAGINATION_SIZE = h.options.core.parameters.paginationSize || 20;
 	
 	/*
@@ -58,16 +57,14 @@ module.exports = function(h) {
 		var invalidUris = [];
 		
 		data.users.forEach(function(userUri) {
-			var baseUri = h.util.uri.baseUri();
-			if(userUri.length > baseUri.length && baseUri === userUri.substring(0, baseUri.length)){
-				var parts = userUri.substr(baseUri.length).split('/');
-				console.dir(parts);
-				if (parts.length > 2 && parts[1] === 'user'){
-					validIds.push(parts[2]);
-					return;
-				}
+			
+			var parsedUri = h.util.uriParser.extractUserId(userUri);
+			if(parsedUri){
+				validIds.push(parsedUri.userId);
 			}
-			invalidUris.push(userUri)
+			else{
+				invalidUris.push(userUri)
+			}
 		});
 		
 		//check for max snapshots allowed
@@ -298,7 +295,9 @@ module.exports = function(h) {
 		},
 		
 		forwardUsers : function(req, res, next) {
-			h.util.dbPaginator.forward("users/user_by_date",function(err,cursor){
+			h.util.dbPaginator.forward("users/user_by_date",function(row){
+				return row.key[1];
+			},function(err,cursor){
 				if(err){
 					h.responses.error(500,"Internal server error.",res,next);
 				}

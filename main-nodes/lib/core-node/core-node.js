@@ -63,6 +63,7 @@ module.exports = function(options) {
 			//				updateHandler : require('./util/wrapped-update-handler.js')(db),
 			//				viewPaginator : require('./util/view-paginator.js')(db),
 			uri : require('./util/core-uri-builder.js')(options.common.endpoints.core),
+			uriParser : require('./util/core-uri-parser.js')(options.common.endpoints.core),
 			//				identifyResource : require('./util/identify-resource.js')
 			link : function(href, rel) {
 				return {
@@ -73,6 +74,7 @@ module.exports = function(options) {
 			
 			dbHelper : require('./util/db-helper.js')(db),
 			dbPaginator : require('./util/db-paginator.js')(db),
+			
 		},
 
 		db : db,
@@ -118,6 +120,7 @@ module.exports = function(options) {
 			}
 		}
 	};
+	apiHelper['util']['dbFetcher'] = require('./util/db-fetcher.js')(apiHelper); 
 
 	// Return binding by invoking the actual handlers, passing the helper object
 	var api = {
@@ -270,12 +273,12 @@ module.exports = function(options) {
 	server.get('/v2/document/:documentId/locations', [ authenticate ], api.location.getAll, [ logging ]);
 
 	//Message	
-	server.get('/v2/userId/:userId/inbox/messages/since/:since', [ authenticate, authorize ], api.message.forwardSince, [ logging ]);
-	server.get('/v2/userId/:userId/:box', [ authenticate, authorize ], api.message.forwardBox, [ logging ]);
-	server.get('/v2/userId/:userId/:box/messages/cursor/:cursorId', [ authenticate, authorize ], api.message.listBox, [ logging ]);
-	server.post('/v2/userId/:userId/inbox/messages', [ authenticate ], api.message.send, [ logging ]);
-	server.get('/v2/userId/:userId/inbox/message/:messageId', [ authenticate, authorize ], api.message.get, [ logging ]);
-	server.del('/v2/userId/:userId/inbox/message/:messageId', [ authenticate, authorize ], api.message.remove, [ logging ]);
+	server.get('/v2/user/:userId/:box/messages/since/:since', [ authenticate, authorize ], api.message.forwardSince, [ logging ]);
+	server.get('/v2/user/:userId/:box', [ authenticate, authorize ], api.message.forwardBox, [ logging ]);
+	server.get('/v2/user/:userId/:box/messages/cursor/:cursorId', [ authenticate, authorize ], api.message.listBox, [ logging ]);
+	server.post('/v2/user/:userId/inbox/messages', [ authenticate ], api.message.send, [ logging ]); //userId => target ==> no authorize here
+	server.get('/v2/user/:userId/:box/message/:messageId', [ authenticate, authorize ], api.message.get, [ logging ]);
+	server.del('/v2/user/:userId/:box/message/:messageId', [ authenticate, authorize ], api.message.remove, [ logging ]);
 
 	// Query
 	server.post('/v2/query', [ authenticate ], api.query.create, [ logging ]);

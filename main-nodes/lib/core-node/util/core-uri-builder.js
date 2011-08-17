@@ -1,3 +1,6 @@
+/**
+ * A helper object that generates resource URIs using the v2 URI templates.
+ */
 module.exports = function(baseUri){
 	
 	var builder = function(p){
@@ -6,6 +9,24 @@ module.exports = function(baseUri){
 		}		
 		else if(p.queryId && p.page){
 			return  baseUri+"/query/stored/"+p.queryId+"/cursor/"+p.page;
+		}
+		else if(p.userId && p.inboxMessageId){
+			return  baseUri+"/user/"+p.userId+"/inbox/message/"+p.inboxMessageId;
+		}
+		else if(p.userId && p.outboxMessageId){
+			return  baseUri+"/user/"+p.userId+"/outbox/message/"+p.outboxMessageId;
+		}		
+		else if(p.userId && p.inbox && p.since){
+			return  baseUri+"/user/"+p.userId+"/inbox/messages/since/"+p.since;
+		}
+		else if(p.userId && p.outbox && p.since){
+			return  baseUri+"/user/"+p.userId+"/outbox/messages/since/"+p.since;
+		}
+		else if(p.userId && p.inbox){
+			return  baseUri+"/user/"+p.userId+"/inbox";
+		}
+		else if(p.userId && p.outbox){
+			return  baseUri+"/user/"+p.userId+"/outbox";
 		}
 		else if(p.queryId){
 			return  baseUri+"/query/stored/"+p.queryId;
@@ -58,6 +79,49 @@ module.exports = function(baseUri){
 		},	
 		queryDispatch : function(){
 			return baseUri+"/query";
+		},
+		
+		inbox : function(user){
+			return builder({
+				userId: user,
+				inbox: true
+			});
+		},
+	
+		outbox : function(user){
+			return builder({
+				userId: user,
+				outbox: true
+			});
+		},
+		
+		inboxSince : function(user,since){
+			return builder({
+				userId: user,
+				inbox: true,
+				since : since
+			});
+		},
+	
+		outboxSince : function(user,since){
+			return builder({
+				userId: user,
+				outbox: true,
+				since : since
+			});
+		},
+	
+		inboxMessage : function(user,message){
+			return builder({
+				userId: user,
+				inboxMessageId: message,
+			});
+		},
+		outboxMessage : function(user,message){
+			return builder({
+				userId: user,
+				outboxMessageId: message,
+			});
 		},
 	
 		tag : function(tag){

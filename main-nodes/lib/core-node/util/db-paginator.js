@@ -68,7 +68,7 @@ module.exports = function(db) {
 	 * If cursor is also null, there are no items yet. 
 	 */
 	//???
-	var forwardSince = function(date, viewName, callback) {
+	var forwardSince = function(viewName, startkey, rowExtractor,  callback) {
 		if (Date.parseRFC3339(date) === undefined) {
 			callback({
 				"error" : {
@@ -79,7 +79,7 @@ module.exports = function(db) {
 		else {
 			db.view(viewName, {
 				limit : 1,
-				startkey : [ date ]
+				startkey : startkey // [...? ,date]
 			}, function(err, dbRes) {
 				if (err) {
 					callback(err);
@@ -90,7 +90,7 @@ module.exports = function(db) {
 						callback(null,null);
 					}
 					else {
-						callback(null, dbRes.rows[0].key[1]);
+						callback(null,rowExtractor(dbRes.rows[0]));
 					}
 				}
 			});
@@ -102,7 +102,7 @@ module.exports = function(db) {
 	 * callback(err,cursor);
 	 * If cursor is also null, there are no items yet. 
 	 */
-	var forward = function(viewName, callback) {
+	var forward = function(viewName, rowExtractor, callback) {
 		db.view(viewName, {
 			limit : 1
 		}, function(err,dbRes){
@@ -114,11 +114,13 @@ module.exports = function(db) {
 					callback(null,null);
 				}
 				else {
-					callback(null,dbRes.rows[0].key[1]);
+					callback(null,rowExtractor(dbRes.rows[0]));
 				}
 			}
 		});
 	};
+	
+	//TODO: bounded views (start AND endkey)
 
 	return {
 		getPage : getPage,
