@@ -295,7 +295,7 @@ module.exports = function(h) {
 		},
 		
 		forwardUsers : function(req, res, next) {
-			h.util.dbPaginator.forward("users/user_by_date",function(row){
+			h.util.dbPaginator.forward("users/user_by_date", [], function(row){
 				return row.key[1];
 			},function(err,cursor){
 				if(err){
@@ -328,7 +328,7 @@ module.exports = function(h) {
 					
 					var key = [userDoc.creationTime, req.uriParams.cursorId];
 					
-					h.util.dbPaginator.getPage('users/user_by_date', key, PAGINATION_SIZE, false, function(row){
+					h.util.dbPaginator.getPage('users/user_by_date', key, [], PAGINATION_SIZE, false, false, function(row){
 						return {
 							key : row.key[1],
 							name : row.value

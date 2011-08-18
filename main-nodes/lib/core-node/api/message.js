@@ -186,8 +186,27 @@ module.exports = function(h) {
 				return;
 			}
 			
-			res.send(501);
-			return next();
+			h.util.dbPaginator.forwardSince("users/messagebox",req.uriParams.since,[req.authenticatedUser, (type === IN ? 'inbox' : 'outbox')],function(row){
+				return row.key[3];
+			},function(err,cursor){
+				if(err){
+					
+					h.responses.error(500,((err.error && err.error.reason) ? err.error.reason : "Internal server error."),res,next);
+				}
+				else if ( cursor === null){
+					res.send(204);
+					return next();
+				}
+				else{
+					console.dir(cursor);
+					
+					var uri = (type === IN ? h.util.uri.inboxMessagePage(req.authenticatedUser,cursor) : h.util.uri.outboxMessagePage(req.authenticatedUser,cursor)); 
+					res.send(303, {
+						link :  h.util.link(uri)
+					},{'Location' : uri});
+					return next();
+				}
+			});
 		},
 		
 		forwardBox : function(req, res, next) {
@@ -197,9 +216,8 @@ module.exports = function(h) {
 				return;
 			}
 			
-			h.util.dbPaginator.forward("users/messagebox",function(row){
-				return row;
-//				return row.key[1];
+			h.util.dbPaginator.forward("users/messagebox",[req.authenticatedUser, (type === IN ? 'inbox' : 'outbox')],function(row){
+				return row.key[3];
 			},function(err,cursor){
 				if(err){
 					h.responses.error(500,"Internal server error.",res,next);
@@ -210,7 +228,8 @@ module.exports = function(h) {
 				}
 				else{
 					console.dir(cursor);
-					var uri = h.util.uri.userListPage(cursor);
+					
+					var uri = (type === IN ? h.util.uri.inboxMessagePage(req.authenticatedUser,cursor) : h.util.uri.outboxMessagePage(req.authenticatedUser,cursor)); 
 					res.send(303, {
 						link :  h.util.link(uri)
 					},{'Location' : uri});
@@ -229,8 +248,64 @@ module.exports = function(h) {
 				return;
 			}
 			
-			res.send(501);
-			return next();
+			h.util.dbFetcher.fetchMessage(req.uriParams.cursorId, function(err,doc){
+				if(err && err === 404){
+					h.responses.error(404,"Cursor not found.",res,next);
+					return;
+				}
+				else if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+					return;
+				}
+				else{
+					var key = [req.authenticatedUser, (type === IN ? 'inbox' : 'outbox'), doc.creationTime, req.uriParams.cursorId];
+					var range = [req.authenticatedUser, (type === IN ? 'inbox' : 'outbox')];
+					
+					var pageLink = (type === IN ? h.util.uri.inboxMessagePage : h.util.uri.outboxMessagePage);
+					
+					h.util.dbPaginator.getPage('users/messagebox', key, range, PAGINATION_SIZE, false, true, function(row){
+						return {
+							key : row.key[3],
+							doc : row.doc
+						};
+					}, function(err, result){
+						if(err){
+							res.send(500);
+						}
+						else{
+							
+							var list = result.list.map(function(message){
+								return {
+									message:renderMessage(message.doc)}
+							});
+							
+							var related = [];
+							["next", "previous"].forEach(function(e){
+								if(result[e]){
+									console.dir( result[e]);
+									related.push({
+										"link" : h.util.link(pageLink(req.authenticatedUser, result[e].key), e)
+									});
+								}
+							});
+							
+							var headers = {};
+							if(result.etag){
+								headers["Etag"] = '"'+result.etag+'"';
+							}
+							
+							res.send(200, {
+								"page" : {
+									"link" : h.util.link(pageLink(req.authenticatedUser,req.uriParams.cursorId))
+								},
+								"list" :  list,
+								"related" : related
+							},headers);
+							return next();
+						}
+					});
+				}
+			});
 		},
 
 		get : function(req, res, next) {

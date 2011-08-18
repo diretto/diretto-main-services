@@ -4,6 +4,9 @@
 module.exports = function(baseUri){
 	
 	var builder = function(p){
+		
+	
+		
 		if(p.documentId && p.commentId){
 			return  baseUri+"/document/"+p.documentId+"/comment/"+p.commentId;
 		}		
@@ -15,7 +18,13 @@ module.exports = function(baseUri){
 		}
 		else if(p.userId && p.outboxMessageId){
 			return  baseUri+"/user/"+p.userId+"/outbox/message/"+p.outboxMessageId;
-		}		
+		}	
+		else if(p.userId && p.inboxMessageCursorId){
+			return  baseUri+"/user/"+p.userId+"/inbox/messages/cursor/"+p.inboxMessageCursorId;
+		}
+		else if(p.userId && p.outboxMessageCursorId){
+			return  baseUri+"/user/"+p.userId+"/outbox/messages/cursor/"+p.outboxMessageCursorId;
+		}			
 		else if(p.userId && p.inbox && p.since){
 			return  baseUri+"/user/"+p.userId+"/inbox/messages/since/"+p.since;
 		}
@@ -124,6 +133,19 @@ module.exports = function(baseUri){
 			});
 		},
 	
+		inboxMessagePage : function(user,message){
+			return builder({
+				userId: user,
+				inboxMessageCursorId: message,
+			});
+		},
+		outboxMessagePage : function(user,message){
+			return builder({
+				userId: user,
+				outboxMessageCursorId: message,
+			});
+		},
+		
 		tag : function(tag){
 			return builder({
 				tagId: tag

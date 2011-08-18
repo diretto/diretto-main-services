@@ -5,7 +5,7 @@ module.exports = function(db) {
 	 * Callback function(err, { list : [] next? : next previous? : previous etag ? :
 	 * etag })
 	 */
-	var getPage = function(view, cursor, paginationSize, descending, rowExtractor, callback) {
+	var getPage = function(view, cursor, rangeKey, paginationSize, descending, includeDocs, rowExtractor, callback) {
 		var result = {
 			list : []
 		};
@@ -20,11 +20,16 @@ module.exports = function(db) {
 		// previous : "123"
 		// });
 
+		var endKey = (rangeKey || []).slice(0);
+		endKey.push({});
+		
 		// fetch page to result.list
 		db.view(view, {
 			limit : (paginationSize + 1),
 			"descending" : descending,
-			startkey : cursor
+			startkey : cursor,
+			endkey : endKey,
+			include_docs : !!includeDocs
 		}, function(err, dbRes) {
 			if (err) {
 				b.abort(function() {
@@ -68,7 +73,7 @@ module.exports = function(db) {
 	 * If cursor is also null, there are no items yet. 
 	 */
 	//???
-	var forwardSince = function(viewName, startkey, rowExtractor,  callback) {
+	var forwardSince = function(viewName, date, rangeKey, rowExtractor,  callback) {
 		if (Date.parseRFC3339(date) === undefined) {
 			callback({
 				"error" : {
@@ -77,9 +82,16 @@ module.exports = function(db) {
 			});
 		}
 		else {
+			var startKey = (rangeKey || []).slice(0);
+			startKey.push(date);
+			
+			var endKey = (rangeKey || []).slice(0);
+			endKey.push({});
+			
 			db.view(viewName, {
 				limit : 1,
-				startkey : startkey // [...? ,date]
+				startkey : startKey,
+				endkey : endKey
 			}, function(err, dbRes) {
 				if (err) {
 					callback(err);
@@ -102,9 +114,15 @@ module.exports = function(db) {
 	 * callback(err,cursor);
 	 * If cursor is also null, there are no items yet. 
 	 */
-	var forward = function(viewName, rowExtractor, callback) {
+	var forward = function(viewName, rangeKey, rowExtractor, callback) {
+		
+		var endKey = (rangeKey || []).slice(0);
+		endKey.push({});
+		
 		db.view(viewName, {
-			limit : 1
+			limit : 1,
+			startkey : rangeKey,
+			endkey : endKey
 		}, function(err,dbRes){
 			if(err){
 				callback(err);
@@ -120,8 +138,6 @@ module.exports = function(db) {
 		});
 	};
 	
-	//TODO: bounded views (start AND endkey)
-
 	return {
 		getPage : getPage,
 		forwardSince : forwardSince,
