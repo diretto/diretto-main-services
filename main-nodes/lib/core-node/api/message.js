@@ -4,7 +4,7 @@ var crypto = require('crypto');
 module.exports = function(h) {
 	
 	var BATCH_LIMIT = h.options.core.parameters.batchLimit || 50;
-	var PAGINATION_SIZE = h.options.core.parameters.paginationSize || 20;
+	var PAGINATION_SIZE = 2; //h.options.core.parameters.paginationSize || 20;
 	
 	var MIN_TITLE_LENGTH = 3;
 	var MAX_TITLE_LENGTH = 128;
@@ -18,6 +18,10 @@ module.exports = function(h) {
 	 * ------------------------------ Validation Functions --------------------------------
 	 */
 	
+	/**
+	 * Checks if the given box type is inbox, outbox or invalid using constants.
+	 * 
+	 */
 	var validateBoxType = function(boxType, response, next){
 		if(boxType === 'inbox'){
 			return IN;
@@ -30,6 +34,9 @@ module.exports = function(h) {
 		}
 	}
 	
+	/**
+	 * Validates a new message to be send.
+	 */
 	var validateMessage = function(data, response, next, callback){
 		var fail = function(msg) {
 			h.responses.error(400,"Invalid message. " + (msg || "Please check your entity structure."),response,next);
@@ -60,6 +67,9 @@ module.exports = function(h) {
 	 * ------------------------------- -----------------------------------------------------
 	 */
 	
+	/**
+	 * Takes a CouchDB doc representing a message and renders to our own message format.
+	 */
 	var renderMessage = function(msgDoc){
 		
 		var msgId = h.c.MESSAGE.unwrap(msgDoc._id);
@@ -150,7 +160,7 @@ module.exports = function(h) {
 				return;
 			}
 			
-			h.util.dbFetcher.fetchMessage(req.uriParams.messageId, function(err,doc){
+			h.util.dbFetcher.fetch(req.uriParams.messageId, h.c.MESSAGE ,function(err,doc){
 				if(err && err === 404){
 					h.responses.error(404,"Message not found.",res,next);
 					return;
@@ -236,9 +246,6 @@ module.exports = function(h) {
 					return next();
 				}
 			});
-			
-//			res.send(501);
-//			return next();
 		},
 		
 		listBox : function(req, res, next) {
@@ -248,7 +255,7 @@ module.exports = function(h) {
 				return;
 			}
 			
-			h.util.dbFetcher.fetchMessage(req.uriParams.cursorId, function(err,doc){
+			h.util.dbFetcher.fetch(req.uriParams.cursorId, h.c.MESSAGE, function(err,doc){
 				if(err && err === 404){
 					h.responses.error(404,"Cursor not found.",res,next);
 					return;
@@ -315,7 +322,7 @@ module.exports = function(h) {
 				return;
 			}
 			
-			h.util.dbFetcher.fetchMessage(req.uriParams.messageId, function(err,doc){
+			h.util.dbFetcher.fetch(req.uriParams.messageId, h.c.MESSAGE, function(err,doc){
 				if(err && err === 404){
 					h.responses.error(404,"Message not found.",res,next);
 					return;

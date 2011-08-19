@@ -92,7 +92,7 @@ module.exports = function(h) {
 	 * Returns an object of all user docs
 	 */
 	var fetchUserDocs = function(list, callback){
-		h.util.dbHelper.batchFetch(list, h.c.USER ,callback);
+		h.util.dbFetcher.batchFetch(list, h.c.USER ,callback);
 	};
 
 	
@@ -231,6 +231,7 @@ module.exports = function(h) {
 					res.send(200, renderResult(userDoc,req.authenticatedUser),{
 						"ETag" : '"'+userDoc._rev+'"'
 					});
+					next();
 				}
 			});
 		},
@@ -336,6 +337,7 @@ module.exports = function(h) {
 					}, function(err, result){
 						if(err){
 							res.send(500);
+							next();
 						}
 						else{
 							

@@ -43,6 +43,9 @@ module.exports = function(baseUri){
 		else if(p.userId){
 			return  baseUri+"/user/"+p.userId;
 		}
+		else if(p.documentId){
+			return  baseUri+"/document/"+p.documentId;
+		}
 		else if(p.userListCursorId){
 			return  baseUri+"/users/cursor/"+p.userListCursorId;
 		}			
@@ -151,6 +154,29 @@ module.exports = function(baseUri){
 				tagId: tag
 			});
 		},
+		document : function(document){
+			return builder({
+				documentId: document
+			});
+		},
+
+		attachment : function(document,attachment){
+			return builder({
+				documentId: document,
+				attachmentId: attachment
+			});
+		},
+
+		collection : function(user,collection){
+			return builder({
+				userId: user,
+				collectionId: collection
+			});
+		},
+		
+		
+		
+		
 		comment : function(document, comment){
 			return builder({
 					documentId: document,

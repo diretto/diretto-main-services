@@ -31,7 +31,19 @@ module.exports = function(h) {
 				"rel" : "self",
 				"href" : "http://diretto.github.com/diretto-api-doc/v2/diretto/core.html"
 			}
-		} ],
+		},{
+			"title" : "Service Registry",
+			"link" : {
+				"rel" : "self",
+				"href" : h.util.uri.serviceRegistry()
+			}
+		},{
+			"title" : "User Factory Resource",
+			"link" : {
+				"rel" : "self",
+				"href" : h.util.uri.users()
+			}
+		}],
 		"parameters" : {
 			"paginationSize" : h.options.core.parameters.paginationSize || 20,
 			"batchLimit" : h.options.core.parameters.batchLimit || 50

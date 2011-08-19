@@ -1,10 +1,37 @@
 module.exports = function(h) {
 
+	var mediatypes = {
+			stored : {},
+			external : {}
+	};
+	for(var mime in h.options.mediatypes.stored){
+		if (h.options.mediatypes.stored.hasOwnProperty(mime)){
+			var item = h.options.mediatypes.stored[mime];
+			mediatypes.stored[mime] = {
+				type: mime.split("/")[0] || "unknown",
+				extension : item.extension,
+				maxSize : item.maxSize,
+			};
+		}
+	}
+	for(var mime in h.options.mediatypes.external){
+		if (h.options.mediatypes.external.hasOwnProperty(mime)){
+			var item = h.options.mediatypes.external[mime];
+			mediatypes.external[mime] = {
+				type: mime.split("/")[0] || "unknown",
+				name : item.name
+			};
+		}
+	}
+		
+		
 	return {
 
 		mediatypes : function(req, res, next) {
-			res.send(501);
-			return next();
+			res.send(200, {
+				"mediatypes": mediatypes
+			});
+			return next();	
 		},
 		uuid : function(req, res, next) {
 			res.send(200, {

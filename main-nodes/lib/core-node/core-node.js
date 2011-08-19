@@ -7,6 +7,7 @@ var cradle = require('cradle');
 
 log.level(restify.LogLevel.Debug);
 
+var Signer = require('signer');
 var PluginHandler = require('plugin-handler').PluginHandler;
 var registryValidator = require('registry-validator');
 
@@ -20,10 +21,13 @@ module.exports = function(options) {
 
 	// TODO fix screwed baseUri options.task.external.uri => foobar/v2 !
 
-	console.dir(options);
+//	console.dir(options);
+	
+	var signer = Signer(options.common.security.salt);
 
-	// Load auth plugin
 	var plugin = new PluginHandler();
+	
+	// Load auth plugin
 	var auth = null;
 	var auths = plugin.preloadAllPluginsSync(path.join(__dirname, '..', '..', 'plugins', 'common', 'auth'), true);
 	if (auths[options.core.auth.plugin]) {
@@ -33,10 +37,28 @@ module.exports = function(options) {
 		console.error("Could not initialize authentication plugin \"" + options.core.auth.plugin + "\"");
 		process.exit(-1);
 	}
+	
+	
+	// Preload external content providers
+	var externalResProviders =  plugin.preloadAllPluginsSync(path.join(__dirname, '..', '..', 'plugins', 'core-node', 'external-resources'), true);
+	var requestedMediatypes = options.mediatypes;
+	
+	options['mediatypes'] = {
+		"stored" : requestedMediatypes.stored,	
+		"external" : {}	
+	};
+
+	//Check if there are avaiable content provider plugins for the types listed in the config
+	requestedMediatypes.external.forEach(function(mime){
+		if(externalResProviders[mime]){
+			options.mediatypes.external[mime] = externalResProviders[mime]();
+		}
+	});
 
 	//Load registry
+	var registryList = options.registry;
 	options.registry = null;
-	registryValidator([ "http://task.diretto.org/v2/", "http://media.diretto.org/", "http://localhost:8006/v2/" ], function(registry) {
+	registryValidator(registryList.services, function(registry) {
 		options.registry = registry;
 	});
 
@@ -56,7 +78,7 @@ module.exports = function(options) {
 	var apiHelper = {
 
 		c : require('./util/constants.js'),
-
+ 
 		options : options,
 
 		util : {
@@ -72,10 +94,12 @@ module.exports = function(options) {
 				}
 			},
 			
-			dbHelper : require('./util/db-helper.js')(db),
+//			dbHelper : require('./util/db-helper.js')(db),
 			dbPaginator : require('./util/db-paginator.js')(db),
 			
 		},
+		
+		signer : signer,
 
 		db : db,
 
@@ -320,9 +344,9 @@ module.exports = function(options) {
 	server.get('/v2/user/:userId', [ authenticate ], api.user.get, [ logging ]);
 	server.put('/v2/user/:userId', [ authenticate, authorize ], api.user.change, [ logging ]);
 	server.post('/v2/users', [], api.user.create, [ logging ]);
-	server.get('/v2/users', [], api.user.forwardUsers, [ logging ]);
-	server.get('/v2/users/cursor/:cursorId', [], api.user.listUsers, [ logging ]);
-	server.post('/v2/users/multiple', [], api.user.fetchMultiple, [ logging ]);
+	server.get('/v2/users', [authenticate], api.user.forwardUsers, [ logging ]);
+	server.get('/v2/users/cursor/:cursorId', [authenticate], api.user.listUsers, [ logging ]);
+	server.post('/v2/users/multiple', [authenticate], api.user.fetchMultiple, [ logging ]);
 
 	var votableUris = [ {
 		uri : "/v2/document/:documentId/attachment/:attachmentId"

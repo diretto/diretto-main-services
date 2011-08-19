@@ -1,7 +1,12 @@
 var barrierpoints = require('barrierpoints');
 
 module.exports = function(db) {
-	/*
+	/**
+	 * Returns a page of the given size from the view, using the cursor and the range key for restricting results.
+	 * 
+	 * This calls the CouchDB view twice and in parallel, in order to get the current page, but also
+	 * cursors for the previous page.  
+	 * 
 	 * Callback function(err, { list : [] next? : next previous? : previous etag ? :
 	 * etag })
 	 */
@@ -13,12 +18,6 @@ module.exports = function(db) {
 		var b = barrierpoints(2, function() {
 			callback(null, result);
 		});
-
-		// callback(null, {
-		// list : ["foo", "bar"],
-		// next : "456",
-		// previous : "123"
-		// });
 
 		var endKey = (rangeKey || []).slice(0);
 		endKey.push({});
@@ -72,7 +71,6 @@ module.exports = function(db) {
 	 * callback(err,cursor);
 	 * If cursor is also null, there are no items yet. 
 	 */
-	//???
 	var forwardSince = function(viewName, date, rangeKey, rowExtractor,  callback) {
 		if (Date.parseRFC3339(date) === undefined) {
 			callback({
