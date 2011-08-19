@@ -1,3 +1,3 @@
 {
-	"services" : ["http://task.diretto.org/v2/","http://media.diretto.org/","http://localhost:8006/v2/"]
+	"services" : ["http://task.diretto.org/v2","http://localhost:8000","http://media.diretto.org/","http://localhost:8006/v2"]
 }

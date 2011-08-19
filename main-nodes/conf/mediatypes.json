@@ -1,0 +1,17 @@
+{
+   "stored":{
+      "image/jpeg":{
+         "extension":"jpg",
+         "maxSize":5242880
+      },
+      "image/png":{
+         "extension":"png",
+         "maxSize":5242880
+      },
+      "text/plain":{
+         "extension":"txt",
+         "maxSize":5242880
+      }
+   },
+   "external":["video/x-diretto-youtube+url","text/x-diretto-twitter+url"]
+}
