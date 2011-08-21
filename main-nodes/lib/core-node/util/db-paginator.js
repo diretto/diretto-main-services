@@ -1,3 +1,4 @@
+require("rfc3339date");
 var barrierpoints = require('barrierpoints');
 
 module.exports = function(db) {

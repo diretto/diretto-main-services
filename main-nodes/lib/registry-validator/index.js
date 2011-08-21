@@ -63,7 +63,7 @@ module.exports = function(services, callback) {
 
 								// TODO: Are we fetching ourself? Then skip... 
 								// TODO: is it addressing the correct Core API ("us")?
-
+								
 								validatedURIs.push({
 									api : {
 										name : j.api.name,

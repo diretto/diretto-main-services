@@ -82,19 +82,14 @@ module.exports = function(options) {
 		options : options,
 
 		util : {
-			//				updateHandler : require('./util/wrapped-update-handler.js')(db),
-			//				viewPaginator : require('./util/view-paginator.js')(db),
 			uri : require('./util/core-uri-builder.js')(options.common.endpoints.core),
 			uriParser : require('./util/core-uri-parser.js')(options.common.endpoints.core),
-			//				identifyResource : require('./util/identify-resource.js')
 			link : function(href, rel) {
 				return {
 					href : href || options.common.endpoints.core,
 					rel : rel || "self"
 				}
 			},
-			
-//			dbHelper : require('./util/db-helper.js')(db),
 			dbPaginator : require('./util/db-paginator.js')(db),
 			
 		},
@@ -105,12 +100,12 @@ module.exports = function(options) {
 
 		uuid : uuid,
 
-		assertion : {
-		//					documentExists : require('./assertions/document-exists.js'),
-		//					taskExists : require('./assertions/task-exists.js'),
-		//					baseTagExists : require('./assertions/basetag-exists.js'),
-		//					submissionExists : require('./assertions/submission-exists.js'),
-		},
+//		assertion : {
+//		//					documentExists : require('./assertions/document-exists.js'),
+//		//					taskExists : require('./assertions/task-exists.js'),
+//		//					baseTagExists : require('./assertions/basetag-exists.js'),
+//		//					submissionExists : require('./assertions/submission-exists.js'),
+//		},
 
 		responses : {
 
@@ -145,6 +140,8 @@ module.exports = function(options) {
 		}
 	};
 	apiHelper['util']['dbFetcher'] = require('./util/db-fetcher.js')(apiHelper); 
+	apiHelper['util']['commonValidator'] = require('./util/common-validator.js')(apiHelper); 
+
 
 	// Return binding by invoking the actual handlers, passing the helper object
 	var api = {
