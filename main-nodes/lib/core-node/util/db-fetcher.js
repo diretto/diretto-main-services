@@ -65,9 +65,15 @@ module.exports = function(h) {
 		});
 	};
 	
+	var fetchVotes = function(){
+		
+	};
+	
 	return {
 		batchFetch : batchFetch,
 		fetch : fetch,
-		exist : exist
+		exist : exist,
+		
+		fetchVotes : fetchVotes
 	};
 };

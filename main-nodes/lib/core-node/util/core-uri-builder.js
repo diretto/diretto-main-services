@@ -5,10 +5,16 @@ module.exports = function(baseUri){
 	
 	var builder = function(p){
 		
-	
+		console.dir(p);
 		
 		if(p.documentId && p.commentId){
 			return  baseUri+"/document/"+p.documentId+"/comment/"+p.commentId;
+		}		
+		else if(p.documentId && p.before && p.after){
+			return  baseUri+"/document/"+p.documentId+"/time/"+p.after+"--"+p.before;
+		}		
+		else if(p.documentId && p.lat && p.lon && p.variance){
+			return  baseUri+"/document/"+p.documentId+"/time/"+p.lat+","+p.lon+","+p.variance;
 		}		
 		else if(p.queryId && p.page){
 			return  baseUri+"/query/stored/"+p.queryId+"/cursor/"+p.page;
@@ -171,6 +177,23 @@ module.exports = function(baseUri){
 			return builder({
 				userId: user,
 				collectionId: collection
+			});
+		},
+		
+		documentTime : function(doc,after, before){
+			return builder({
+				documentId: doc,
+				after : after,
+				before : before
+			});
+		},
+		
+		documentLocation : function(doc,lat,lon,variance){
+			return builder({
+				documentId: doc,
+				lat : lat,
+				lon : lon,
+				variance : variance
 			});
 		},
 		

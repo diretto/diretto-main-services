@@ -93,6 +93,15 @@ module.exports = function(h) {
 	 * Tasks a location and returns true if valid and false otherwise.
 	 */
 	var validateLocation = function(location) {
+		//TODO:
+		return true;
+	};
+
+	/**
+	 * Tasks a location and returns true if valid and false otherwise.
+	 */
+	var validateLocationValues = function(lat,lon,variance) {
+		//TODO:
 		return true;
 	};
 
@@ -212,6 +221,10 @@ module.exports = function(h) {
 	return {
 		validateDocumentData : validateDocumentData,
 		validateUUID : validateUUID,
-		validateAttachmentData : validateAttachmentData
+		validateAttachmentData : validateAttachmentData,
+		
+		validateDate : validateDate,
+		validateLocation  : validateLocation,
+		validateLocationValues : validateLocationValues
 	};
 };
