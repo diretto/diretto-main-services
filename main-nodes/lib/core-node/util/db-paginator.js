@@ -55,7 +55,8 @@ module.exports = function(db) {
 		db.view(view, {
 			limit : (paginationSize + 1),
 			"descending" : (!descending),
-			startkey : cursor
+			startkey : cursor,
+			endkey : endKey
 		}, function(err, dbRes) {
 			if (dbRes) {
 				if (dbRes.rows.length > 1) {
