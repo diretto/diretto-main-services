@@ -4,7 +4,7 @@ var crypto = require('crypto');
 module.exports = function(h) {
 	
 	var BATCH_LIMIT = h.options.core.parameters.batchLimit || 50;
-	var PAGINATION_SIZE = 2; //h.options.core.parameters.paginationSize || 20;
+	var PAGINATION_SIZE = h.options.core.parameters.paginationSize || 20;
 	
 	var MIN_TITLE_LENGTH = 3;
 	var MAX_TITLE_LENGTH = 128;

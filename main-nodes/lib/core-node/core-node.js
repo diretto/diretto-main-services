@@ -237,7 +237,7 @@ module.exports = function(options) {
 	server.get('/v2/document/:documentId/attachment/:attachmentId', [ authenticate ], api.attachment.get, [ logging ]);
 	server.del('/v2/document/:documentId/attachment/:attachmentId/lock', [ authenticate ], api.attachment.unlock, [ logging ]);
 	server.post('/v2/document/:documentId/attachments', [ authenticate ], api.attachment.create, [ logging ]);
-	server.get('/v2/document/:documentId/attachments', [ authenticate ], api.attachment.forwardAttachments, [ logging ]);
+	server.get('/v2/document/:documentId/attachment/:attachmentId/file', [ authenticate ], api.attachment.forwardAttachment, [ logging ]);
 	server.get('/v2/document/:documentId/attachments/cursor/:cursorId', [ authenticate ], api.attachment.listAttachments, [ logging ]);
 
 	// Collection

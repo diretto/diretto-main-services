@@ -5,10 +5,20 @@ module.exports = function(baseUri){
 	
 	var builder = function(p){
 		
-		console.dir(p);
+//		console.dir(p);
 		
 		if(p.documentId && p.commentId){
 			return  baseUri+"/document/"+p.documentId+"/comment/"+p.commentId;
+		}	
+		
+		else if(p.userId && p.userDocumentPageCursorId){
+			return  baseUri+"/user/"+p.userId+"/documents/cursor/"+p.userDocumentPageCursorId;
+		}
+		else if(p.documentPageCursorId){
+			return  baseUri+"/documents/cursor/"+p.documentPageCursorId;
+		}
+		else if(p.documentId && p.attachmentId){
+			return  baseUri+"/document/"+p.documentId+"/attachment/"+p.attachmentId;
 		}		
 		else if(p.documentId && p.before && p.after){
 			return  baseUri+"/document/"+p.documentId+"/time/"+p.after+"--"+p.before;
@@ -197,13 +207,30 @@ module.exports = function(baseUri){
 			});
 		},
 		
+		userDocumentPage : function(user, cursor){
+			return builder({
+				userId: user,
+				userDocumentPageCursorId: cursor,
+			});
+		},
 		
+		documentListPage : function(cursor){
+			return builder({
+				documentPageCursorId: cursor,
+			});
+		},
 		
 		
 		comment : function(document, comment){
 			return builder({
 					documentId: document,
 					commentId: comment
+			});
+		},	
+		comment : function(document, attachment){
+			return builder({
+					documentId: document,
+					attachmentId: attachment
 			});
 		},	
 		query : function(query){

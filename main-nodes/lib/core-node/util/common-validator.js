@@ -35,9 +35,9 @@ module.exports = function(h) {
 				if(item.external.name && (typeof item.external.name === "string") && item.external.name.length > 0 && (item.external.link !== undefined)){
 					var link = null;
 					if(item.external.link && item.external.link.href && (typeof item.external.link.href === "string")){
-						link = { 
-							link:h.util.uri.user(item.external.link.href)
-						}; 
+						link = h.util.link(item.external.link.href);
+						
+						console.dir(link);
 					}
 					valid.push({
 						external : {
@@ -68,14 +68,32 @@ module.exports = function(h) {
 			else{
 				invalid.push(item);
 			}
-			
-			console.log(item);
-			//TODO:
-			valid.push(item);
 		});
 		
 		return [invalid, valid];
 	};
+	
+	var flattenPersonList = function(list){
+		var user = [];
+		var external = [];
+		
+		list.forEach(function(p){
+			if(p.external){
+				external.push({
+					name : p.external.name,
+					link : (p.external.link && p.external.link.href ? p.external.link.href : null)
+				});
+			}
+			else if(p.user){
+				user.push(h.util.uriParser.extractUserId(p.user.link.href).userId);				
+			}
+		})
+		
+		return {
+			user : user,
+			external : external				
+		};
+	}
 
 	/**
 	 * Tasks a date and returns true if valid and false otherwise.
@@ -225,6 +243,8 @@ module.exports = function(h) {
 		
 		validateDate : validateDate,
 		validateLocation  : validateLocation,
-		validateLocationValues : validateLocationValues
+		validateLocationValues : validateLocationValues,
+		
+		flattenPersonList : flattenPersonList
 	};
 };

@@ -150,6 +150,7 @@ module.exports = function(db) {
 				callback(err);
 			}
 			else{
+				console.dir(dbRes);
 				if (dbRes.rows.length === 0) {
 					callback(null,null);
 				}
