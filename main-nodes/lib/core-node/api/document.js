@@ -171,7 +171,6 @@ module.exports = function(h) {
 						}
 						else if(code && code === 200){
 							h.responses.error(409,"Document already exists.",res,next);
-							console.log("Hji");
 							return;
 						}
 						else {

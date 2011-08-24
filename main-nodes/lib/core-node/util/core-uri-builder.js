@@ -17,6 +17,9 @@ module.exports = function(baseUri){
 		else if(p.documentPageCursorId){
 			return  baseUri+"/documents/cursor/"+p.documentPageCursorId;
 		}
+		else if(p.linkPageCursorId){
+			return  baseUri+"/links/cursor/"+p.linkPageCursorId;
+		}
 		else if(p.documentId && p.attachmentId){
 			return  baseUri+"/document/"+p.documentId+"/attachment/"+p.attachmentId;
 		}		
@@ -56,6 +59,9 @@ module.exports = function(baseUri){
 		else if(p.queryId){
 			return  baseUri+"/query/stored/"+p.queryId;
 		}	
+		else if(p.linkId){
+			return  baseUri+"/link/"+p.linkId;
+		}	
 		else if(p.userId){
 			return  baseUri+"/user/"+p.userId;
 		}
@@ -89,6 +95,9 @@ module.exports = function(baseUri){
 		},		
 		usersMultiple : function(){
 			return baseUri+"/users/multiple"; 
+		},		
+		links : function(){
+			return baseUri+"/links"; 
 		},		
 		uuid : function(){
 			return baseUri+"/service/uuid"; 
@@ -170,6 +179,13 @@ module.exports = function(baseUri){
 				tagId: tag
 			});
 		},
+
+		link : function(link){
+			return builder({
+				linkId: link
+			});
+		},
+
 		document : function(document){
 			return builder({
 				documentId: document
@@ -217,6 +233,12 @@ module.exports = function(baseUri){
 		documentListPage : function(cursor){
 			return builder({
 				documentPageCursorId: cursor,
+			});
+		},
+		
+		linkListPage : function(cursor){
+			return builder({
+				linkPageCursorId: cursor,
 			});
 		},
 		
