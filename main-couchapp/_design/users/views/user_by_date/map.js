@@ -1,5 +1,5 @@
 /**
- * Provides a view of all task ids and their creation time.
+ * Provides a view of all user ids and their creation time.
  * 
  * @author Benjamin Erb
  */

@@ -5,7 +5,7 @@
  */
 function(doc) {
 
-	  if (doc.type === "document") {
+	  if (doc.type === "document" && doc.enabled === true) {
 		  emit([doc._id.substr(2),"document"],null);
 	  }
 	  else if (doc.type === "attachment") {
