@@ -55,12 +55,34 @@ module.exports = function(db) {
 		db.view(view, {
 			limit : (paginationSize + 1),
 			"descending" : (!descending),
-			startkey : cursor,
-			endkey : endKey
+			startkey : cursor
 		}, function(err, dbRes) {
 			if (dbRes) {
+				
+				var compareRange = function(entry){
+					var equal = true;
+					for(var i = 0;i<rangeKey.length && equal;i++){
+						equal = (entry && entry[i] && entry[i] === rangeKey[i]);
+					}
+					return equal;
+				};
+				
+				//first entry (0) is current doc
 				if (dbRes.rows.length > 1) {
-					result['previous'] = rowExtractor(dbRes.rows[dbRes.rows.length - 1]);
+					//check if really in range, we might have crossed view collation border.
+					var previousIdx = -1;
+					var inRange = true;
+					for (var i = 1; i <  dbRes.rows.length && inRange; i++) {
+						if(compareRange(dbRes.rows[i].key)){
+							previousIdx = i;
+						}
+						else{
+							inRange = false;
+						}
+					}
+					if(previousIdx !== -1){
+						result['previous'] = rowExtractor(dbRes.rows[previousIdx]);
+					}
 				}
 			}
 			b.submit();
