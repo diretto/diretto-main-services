@@ -7,7 +7,7 @@ var util = require('util');
  * 
  * @author Benjamin Erb
  */
-exports.Plugin = {
+module.exports.Plugin = {
 		
 	version : "0.1.0",
 	

@@ -1,2 +1,2 @@
-exports.Config = {
+module.exports.Config = {
 };
