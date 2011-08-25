@@ -13,6 +13,9 @@ module.exports = function(baseUri){
 		else if(p.userId && p.collectionId && p.documentId){
 			return  baseUri+"/user/"+p.userId+"/collection/"+p.collectionId+"/document/"+p.documentId;
 		}
+		else if(p.userId && p.collectionId && p.cursorId){
+			return  baseUri+"/user/"+p.userId+"/collection/"+p.collectionId+"/documents/cursor/"+p.cursorId;
+		}
 		else if(p.userId && p.userDocumentPageCursorId){
 			return  baseUri+"/user/"+p.userId+"/documents/cursor/"+p.userDocumentPageCursorId;
 		}
@@ -293,18 +296,21 @@ module.exports = function(baseUri){
 			});	
 		},
 		
+		collectionPageCursor  : function(user, collection, cursor){
+			return builder({
+				userId: user,
+				collectionId: collection,
+				cursorId : cursor
+			});
+		},
+		
 		comment : function(document, comment){
 			return builder({
 					documentId: document,
 					commentId: comment
 			});
 		},	
-		comment : function(document, attachment){
-			return builder({
-					documentId: document,
-					attachmentId: attachment
-			});
-		},	
+
 		query : function(query){
 			return builder({
 				queryId: query

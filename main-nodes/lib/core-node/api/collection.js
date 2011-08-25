@@ -4,6 +4,9 @@ module.exports = function(h) {
 	 * ------------------------------ Validation Functions
 	 * --------------------------------
 	 */
+
+	var PAGINATION_SIZE = h.options.core.parameters.paginationSize || 20;
+
 	var COL_TITLE_MIN_LENGTH = 3;
 	var COL_TITLE_MAX_LENGTH = 128;
 
@@ -66,6 +69,19 @@ module.exports = function(h) {
 				}
 			}
 		});
+	};
+	
+	
+	var renderCollection = function(colDoc){
+		return {
+		      "link": h.util.link(h.util.uri.collection(colDoc.creator, colDoc.collectionId)),
+		       "title":colDoc.title,
+		       "description":colDoc.description,
+		       "creationTime":colDoc.creationTime,
+		       "creator": h.util.link(h.util.uri.user(colDoc.creator)),
+		       "nonpublic":colDoc.nonpublic,
+		       "documents": h.util.link(h.util.uri.collection(colDoc.creator, colDoc.collectionId)+"/documents")
+		    };
 	};
 
 	return {
@@ -212,29 +228,310 @@ module.exports = function(h) {
 		},
 
 		remove : function(req, res, next) {
-			res.send(501);
-			return next();
+			h.util.dbFetcher.fetch(req.uriParams.collectionId, h.c.COLLECTION, function(err, doc) {
+				if (err && err === 404) {
+					h.responses.error(404, "Collection not found.", res, next);
+					return;
+				}
+				else if (!doc) {
+					h.responses.error(500, "Internal server error.", res, next);
+					return;
+				}
+				else {
+
+					h.db.remove(doc._id, doc._rev, function(err) {
+						if (err) {
+							h.responses.error(500, "Internal server error.", res, next);
+							return;
+						}
+						else {
+							res.send(204);
+							return next();
+							//TODO: Cleanup => remove docs in collection
+						}
+					});
+
+				}
+			});
 		},
 
 		get : function(req, res, next) {
-			res.send(501);
-			return next();
+			h.util.dbFetcher.fetch(req.uriParams.collectionId, h.c.COLLECTION, function(err, doc) {
+				if (err && err === 404) {
+					h.responses.error(404, "Collection not found.", res, next);
+					return;
+				}
+				else if (!doc) {
+					h.responses.error(500, "Internal server error.", res, next);
+					return;
+				}
+				else {
+					if(req.authenticatedUser !== doc.creator && doc.nonpublic === true){
+						h.responses.error(403, "You are not allowed to view this private collection.", res, next);
+						return;
+					}
+					else{
+						res.send(200, {
+							"collection" : renderCollection(doc)
+						});
+						return next();
+					}
+				}
+			});
+		},
+		
+		getCollectionDoc : function(req, res, next) {
+			h.util.dbFetcher.fetch(req.uriParams.collectionId, h.c.COLLECTION, function(err, doc) {
+				if (err && err === 404) {
+					h.responses.error(404, "Collection not found.", res, next);
+					return;
+				}
+				else if (!doc) {
+					h.responses.error(500, "Internal server error.", res, next);
+					return;
+				}
+				else {
+					if(req.authenticatedUser !== doc.creator && doc.nonpublic === true){
+						h.responses.error(403, "You are not allowed to view this private collection.", res, next);
+						return;
+					}
+					else{
+						
+						h.util.dbFetcher.fetch(h.util.dbHelper.concat(req.uriParams.userId, req.uriParams.collectionId, req.uriParams.documentId), h.c.COLLECTIONDOCUMENT, function(err,doc){
+							if (err && err === 404) {
+								h.responses.error(404, "Document not in collection.", res, next);
+								return;
+							}
+							else if (!doc) {
+								h.responses.error(500, "Internal server error.", res, next);
+								return;
+							}
+							else {
+								if(req.authenticatedUser !== doc.creator && doc.nonpublic === true){
+									h.responses.error(403, "You are not allowed to view this private collection.", res, next);
+									return;
+								}
+								else{
+									res.send(303,null,{
+										Location: h.util.uri.document(doc.documentId)
+									});
+									return next();
+								}
+							}
+						});
+						
+					}
+				}
+			});
+		},
+		
+		removeCollectionDoc : function(req, res, next) {
+			h.util.dbFetcher.fetch(req.uriParams.collectionId, h.c.COLLECTION, function(err, doc) {
+				if (err && err === 404) {
+					h.responses.error(404, "Collection not found.", res, next);
+					return;
+				}
+				else if (!doc) {
+					h.responses.error(500, "Internal server error.", res, next);
+					return;
+				}
+				else {
+					if(req.authenticatedUser !== doc.creator && doc.nonpublic === true){
+						h.responses.error(403, "You are not allowed to view this private collection.", res, next);
+						return;
+					}
+					else{
+						
+						h.util.dbFetcher.fetch(h.util.dbHelper.concat(req.uriParams.userId, req.uriParams.collectionId, req.uriParams.documentId), h.c.COLLECTIONDOCUMENT, function(err,doc){
+							if (err && err === 404) {
+								h.responses.error(404, "Document not in collection.", res, next);
+								return;
+							}
+							else if (!doc) {
+								h.responses.error(500, "Internal server error.", res, next);
+								return;
+							}
+							else {
+								if(req.authenticatedUser !== doc.creator && doc.nonpublic === true){
+									h.responses.error(403, "You are not allowed to view this private collection.", res, next);
+									return;
+								}
+								else{
+									console.log("bla");
+									h.db.remove(doc._id, doc._rev, function(err) {
+										if (err) {
+											h.responses.error(500, "Internal server error.", res, next);
+											return;
+										}
+										else {
+											res.send(204);
+											return next();
+											//TODO: Cleanup => remove docs in collection
+										}
+									});
+								}
+							}
+						});
+						
+					}
+				}
+			});
 		},
 
 		forwardCollectionDocs : function(req, res, next) {
-			// TODO check if public or user === creator
-			res.send(501);
-			return next();
+			h.util.dbFetcher.fetch(req.uriParams.collectionId, h.c.COLLECTION, function(err, doc) {
+				if (err && err === 404) {
+					h.responses.error(404, "Collection not found.", res, next);
+					return;
+				}
+				else if (!doc) {
+					h.responses.error(500, "Internal server error.", res, next);
+					return;
+				}
+				else {
+					if(req.authenticatedUser !== doc.creator && doc.nonpublic === true){
+						h.responses.error(403, "You are not allowed to view this private collection.", res, next);
+						return;
+					}
+					else{
+						h.util.dbPaginator.forward("docs/docs_by_collection",[req.uriParams.userId, req.uriParams.collectionId],function(row){
+							return row.key[2];
+						},function(err,cursor){
+							if(err){
+								h.responses.error(500,"Internal server error.",res,next);
+							}
+							else if ( cursor === null){
+								res.send(204);
+								return next();
+							}
+							else{
+								console.dir(cursor);
+								
+								var uri = h.util.uri.collectionPageCursor(req.uriParams.userId, req.uriParams.collectionId, cursor); 
+								res.send(303, {
+									link :  h.util.link(uri)
+								},{'Location' : uri});
+								return next();
+							}
+						});
+					}
+				}
+			});
 		},
 
 		listCollectionDocs : function(req, res, next) {
-			res.send(501);
-			return next();
+			h.util.dbFetcher.fetch(req.uriParams.collectionId, h.c.COLLECTION, function(err, doc) {
+				if (err && err === 404) {
+					h.responses.error(404, "Collection not found.", res, next);
+					return;
+				}
+				else if (!doc) {
+					h.responses.error(500, "Internal server error.", res, next);
+					return;
+				}
+				else {
+					if(req.authenticatedUser !== doc.creator && doc.nonpublic === true){
+						h.responses.error(403, "You are not allowed to view this private collection.", res, next);
+						return;
+					}
+					else{
+						h.util.dbFetcher.fetch(h.util.dbHelper.concat(req.uriParams.userId, req.uriParams.collectionId, req.uriParams.cursorId), h.c.COLLECTIONDOCUMENT, function(err,doc){
+							if(err && err === 404){
+								h.responses.error(404,"Cursor not found.",res,next);
+								return;
+							}
+							else if(err){
+								h.responses.error(500,"Internal server error.",res,next);
+								return;
+							}
+							else{
+								var key = [req.uriParams.userId, doc.collectionId, req.uriParams.cursorId];
+								var range = [req.uriParams.userId, doc.collectionId];
+								
+								var pageLink = h.util.uri.collectionPageCursor;
+								
+								h.util.dbPaginator.getPage('docs/docs_by_collection', key, range, PAGINATION_SIZE, false, true, function(row){
+									return {
+										key : row.key[2]
+									};
+								}, function(err, result){
+									if(err){
+										res.send(500);
+									}
+									else{
+										
+										var list = result.list.map(function(d){
+											console.dir(doc);
+											return {
+												document: {
+													link : h.util.link(h.util.uri.document(d.key))
+												}
+											};
+										});
+										
+										var related = [];
+										["next", "previous"].forEach(function(e){
+											if(result[e]){
+												console.dir( result[e]);
+												related.push({
+													"link" : h.util.link(pageLink(req.uriParams.userId, doc.collectionId, result[e].key), e)
+												});
+											}
+										});
+										
+										var headers = {};
+										if(result.etag){
+											headers["Etag"] = '"'+result.etag+'"';
+										}
+										
+										res.send(200, {
+											"page" : {
+												"link" : h.util.link(pageLink(req.uriParams.userId, doc.collectionId,req.uriParams.cursorId))
+											},
+											"list" :  list,
+											"related" : related
+										},headers);
+										return next();
+									}
+								});
+							}
+						});
+					}
+				}
+			});
 		},
 
 		getUserCollections : function(req, res, next) {
-			res.send(501);
-			return next();
+			var range;
+			if(req.authenticatedUser !== req.uriParams.userId){
+				range = [req.uriParams.userId, "public"];
+			}
+			else{
+				range = [req.uriParams.userId];
+			}
+			
+			h.util.dbPaginator.getPage('docs/collections_by_user', range, range, 10000, false, true, function(row){
+				return {
+					doc : row.doc
+				};
+			}, function(err, result){
+				if(err){
+					res.send(500);
+				}
+				else{
+					
+					var list = result.list.map(function(col){
+						return {
+							collection :renderCollection(col.doc)}
+					});
+					
+					res.send(200, {
+						"collections" : list
+					});
+					return next();
+				}
+			});
+
 		}
 
 	};

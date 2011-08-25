@@ -247,6 +247,8 @@ module.exports = function(options) {
 	server.del('/v2/user/:userId/collection/:collectionId', [ authenticate, authorize ], api.collection.remove, [ logging ]);
 	server.get('/v2/user/:userId/collection/:collectionId', [ authenticate ], api.collection.get, [ logging ]);
 	server.get('/v2/user/:userId/collection/:collectionId/documents', [ authenticate ], api.collection.forwardCollectionDocs, [ logging ]);
+	server.get('/v2/user/:userId/collection/:collectionId/document/:documentId', [ authenticate ], api.collection.getCollectionDoc, [ logging ]);
+	server.del('/v2/user/:userId/collection/:collectionId/document/:documentId', [ authenticate, authorize ], api.collection.removeCollectionDoc, [ logging ]);
 	server.get('/v2/user/:userId/collection/:collectionId/documents/cursor/:cursorId', [ authenticate ], api.collection.listCollectionDocs, [ logging ]);
 	server.get('/v2/user/:userId/collections', [ authenticate ], api.collection.getUserCollections, [ logging ]);
 
