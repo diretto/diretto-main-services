@@ -9,10 +9,18 @@ module.exports = function(baseUri){
 		
 		if(p.documentId && p.commentId){
 			return  baseUri+"/document/"+p.documentId+"/comment/"+p.commentId;
-		}	
-		
+		}		
+		else if(p.userId && p.collectionId && p.documentId){
+			return  baseUri+"/user/"+p.userId+"/collection/"+p.collectionId+"/document/"+p.documentId;
+		}
 		else if(p.userId && p.userDocumentPageCursorId){
 			return  baseUri+"/user/"+p.userId+"/documents/cursor/"+p.userDocumentPageCursorId;
+		}
+		else if(p.userId && p.collection){
+			return  baseUri+"/user/"+p.userId+"/collections";
+		}
+		else if(p.userId && p.collectionId){
+			return  baseUri+"/user/"+p.userId+"/collection/"+p.collectionId;
 		}
 		else if(p.documentPageCursorId){
 			return  baseUri+"/documents/cursor/"+p.documentPageCursorId;
@@ -20,6 +28,12 @@ module.exports = function(baseUri){
 		else if(p.linkPageCursorId){
 			return  baseUri+"/links/cursor/"+p.linkPageCursorId;
 		}
+		else if(p.userId && p.userCommentPageCursorId){
+			return  baseUri+"/user/"+p.userId+"/comments/cursor/"+p.userCommentPageCursorId;
+		}		
+		else if(p.documentId && p.documentCommentPageCursorId){
+			return  baseUri+"/document/"+p.documentId+"/comments/cursor/"+p.documentCommentPageCursorId;
+		}		
 		else if(p.documentId && p.attachmentId){
 			return  baseUri+"/document/"+p.documentId+"/attachment/"+p.attachmentId;
 		}		
@@ -230,6 +244,21 @@ module.exports = function(baseUri){
 			});
 		},
 		
+		documentCommentPage : function(document, cursor){
+			return builder({
+				documentId: document,
+				documentCommentPageCursorId: cursor,
+			});
+		},
+		
+		userCommentPage : function(user, cursor){
+			return builder({
+				userId: user,
+				userCommentPageCursorId: cursor,
+			});
+		},
+		
+		
 		documentListPage : function(cursor){
 			return builder({
 				documentPageCursorId: cursor,
@@ -242,6 +271,27 @@ module.exports = function(baseUri){
 			});
 		},
 		
+		collection : function(user, collection){
+			return builder({
+				userId: user,
+				collectionId: collection
+			});			
+		},
+		
+		collection : function(user, collection){
+			return builder({
+				userId: user,
+				collectionId: collection
+			});			
+		},
+		
+		collectionDocument : function(user, collection, document){
+			return builder({
+				userId: user,
+				collectionId: collection,
+				documentId : document
+			});	
+		},
 		
 		comment : function(document, comment){
 			return builder({

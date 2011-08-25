@@ -112,18 +112,24 @@ module.exports = function(h) {
 				var b = barrierpoints(2, saveLink);
 
 				[ sourceId, destId ].forEach(function(doc) {
-					//TODO: check if doc exists
-					//doc.documentId
-					if(false){
-						b.abort(function(){
-							h.responses.error(404, "Linked document ("+h.util.uri.document(doc.documentId)+") not found.", res, next);
-							return;
-						});
-					}
-					else{
-						b.submit();
-						
-					}
+					h.util.dbFetcher.viewKeyExists('docs/published_docs', doc.documentId, function(err, published){
+						if(err){
+							b.abort(function(){
+								h.responses.error(500, "Internal server error.", res, next);
+								return;
+							});
+						}
+						else if(!published){
+							b.abort(function(){
+								h.responses.error(404, "Linked document ("+h.util.uri.document(doc.documentId)+") not found.", res, next);
+								return;
+							});
+						}
+						else{
+							b.submit();
+						}
+					});
+					
 				});
 
 			});

@@ -54,6 +54,7 @@ module.exports = function(h) {
 						
 						var commentDoc = {
 								_id : h.c.COMMENT.wrap(h.util.dbHelper.concat(documentId,commentId)),
+								type : h.c.COMMENT.TYPE,
 								commentId : commentId,
 								documentId : documentId,
 								creator : req.authenticatedUser,
@@ -91,17 +92,55 @@ module.exports = function(h) {
 		},
 		
 		forwardDocumentComments : function(req, res, next) {
-			res.send(501);
-			return next();
+			h.util.dbPaginator.forward("docs/comments_by_doc",[req.uriParams.documentId],function(row){
+				return row.key[2];
+			},function(err,cursor){
+				if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else if ( cursor === null){
+					res.send(204);
+					return next();
+				}
+				else{
+					console.dir(cursor);
+					
+					var uri = h.util.uri.documentCommentPage(req.uriParams.documentId, cursor); 
+					res.send(303, {
+						link :  h.util.link(uri)
+					},{'Location' : uri});
+					return next();
+				}
+			});	
 		},
+		
 		listDocumentComments : function(req, res, next) {
 			res.send(501);
 			return next();
 		},
+		
 		forwardUserComments : function(req, res, next) {
-			res.send(501);
-			return next();
-		},
+			h.util.dbPaginator.forward("docs/comments_by_user",[req.uriParams.userId],function(row){
+				return row.key[2];
+			},function(err,cursor){
+				if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else if ( cursor === null){
+					res.send(204);
+					return next();
+				}
+				else{
+					console.dir(cursor);
+					
+					var uri = h.util.uri.userCommentPage(req.uriParams.userId, cursor); 
+					res.send(303, {
+						link :  h.util.link(uri)
+					},{'Location' : uri});
+					return next();
+				}
+			});		},
+		
 		listUserComments : function(req, res, next) {
 			res.send(501);
 			return next();

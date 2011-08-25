@@ -243,7 +243,7 @@ module.exports = function(options) {
 	// Collection
 	server.post('/v2/user/:userId/collection/:collectionId/documents', [ authenticate, authorize ], api.collection.add, [ logging ]);
 	server.put('/v2/user/:userId/collection/:collectionId', [ authenticate, authorize ], api.collection.change, [ logging ]);
-	server.put('/v2/user/:userId/collections', [ authenticate, authorize ], api.collection.create, [ logging ]);
+	server.post('/v2/user/:userId/collections', [ authenticate, authorize ], api.collection.create, [ logging ]);
 	server.del('/v2/user/:userId/collection/:collectionId', [ authenticate, authorize ], api.collection.remove, [ logging ]);
 	server.get('/v2/user/:userId/collection/:collectionId', [ authenticate ], api.collection.get, [ logging ]);
 	server.get('/v2/user/:userId/collection/:collectionId/documents', [ authenticate ], api.collection.forwardCollectionDocs, [ logging ]);

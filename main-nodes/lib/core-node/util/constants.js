@@ -18,7 +18,9 @@ module.exports = (function() {
 	                [ "collection", "n" ],
 	                [ "message", "m" ],
 	                [ "document", "d" ],
-	                [ "document", "d" ]
+	                [ "vote", "v" ],
+	                [ "query", "q" ],
+	                [ "collectiondocument", "p" ]
      ];
 
 	var c = {};

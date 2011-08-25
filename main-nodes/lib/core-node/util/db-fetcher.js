@@ -3,29 +3,28 @@ module.exports = function(h) {
 	var db  = h.db;
 	
 	/**
-	 * Takes a list of diretto resource IDs, their document type and 
-	 * fetches all of them in a single result, yielding an object literal of 
-	 * resource ID => couchDB documents. 
-	 * The document type is needed for converting diretto IDs to CouchDB doc IDs
-	 * and vice versa.
+	 * Takes a list of diretto resource IDs, their document type and fetches all
+	 * of them in a single result, yielding an object literal of resource ID =>
+	 * couchDB documents. The document type is needed for converting diretto IDs
+	 * to CouchDB doc IDs and vice versa.
 	 * 
 	 * Callback: function(err, resultObj);
 	 */
 	var batchFetch = function(list, docType, callback){
-//		console.dir(list);
+// console.dir(list);
 		db.some({"include_docs" : true},{
 			"keys": list.map(function(id){
 				return docType.wrap(id);
 			}),
 			
 		},function(err, dbResult){
-//			console.dir(dbResult);
+// console.dir(dbResult);
 			if(err){
 				callback(err);
 			}
 			else{
 				var result = {};
-				//Add db results to object
+				// Add db results to object
 				for(var i = 0;i<dbResult.length;i++){
 					var row = dbResult[i];
 					result[docType.unwrap(row.key)] = row.doc || null;
@@ -65,6 +64,23 @@ module.exports = function(h) {
 		});
 	};
 	
+	var viewKeyExists = function(view, key, callback){
+		h.db.view(view, {
+			limit : 1,
+			key : key,
+		}, function(err, dbRes) {
+			if (dbRes && dbRes.length === 1) {
+				callback(null, true);
+			}
+			else if (dbRes) {
+				callback(null, false);
+			}
+			else {
+				callback(err);
+			}
+		});
+	};
+	
 	var fetchVotes = function(){
 		
 	};
@@ -74,6 +90,8 @@ module.exports = function(h) {
 		fetch : fetch,
 		exist : exist,
 		
-		fetchVotes : fetchVotes
+		viewKeyExists : viewKeyExists,
+		
+		fetchVotes : fetchVotes,
 	};
 };
