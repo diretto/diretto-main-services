@@ -16,6 +16,9 @@ module.exports = function(baseUri){
 		else if(p.userId && p.collectionId && p.cursorId){
 			return  baseUri+"/user/"+p.userId+"/collection/"+p.collectionId+"/documents/cursor/"+p.cursorId;
 		}
+		else if(p.documentId && p.userId && p.key){
+			return  baseUri+"/document/"+p.documentId+"/value/"+p.userId+"/"+p.key;
+		}
 		else if(p.userId && p.userDocumentPageCursorId){
 			return  baseUri+"/user/"+p.userId+"/documents/cursor/"+p.userDocumentPageCursorId;
 		}
@@ -308,6 +311,14 @@ module.exports = function(baseUri){
 			return builder({
 					documentId: document,
 					commentId: comment
+			});
+		},	
+
+		keyvalue : function(document, user, key){
+			return builder({
+					documentId: document,
+					userId: user,
+					key : key
 			});
 		},	
 

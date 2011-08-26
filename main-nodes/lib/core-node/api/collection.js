@@ -510,7 +510,7 @@ module.exports = function(h) {
 				range = [req.uriParams.userId];
 			}
 			
-			h.util.dbPaginator.getPage('docs/collections_by_user', range, range, 10000, false, true, function(row){
+			h.util.dbPaginator.getPage('docs/collections_by_user', range, range, 2048, false, true, function(row){
 				return {
 					doc : row.doc
 				};
