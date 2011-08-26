@@ -77,7 +77,7 @@ module.exports = function(h) {
 
 							//calculate token
 							/* username, path, length, mimetype, callback */
-							var token = h.signer.signRequest(req.authenticatedUser, path, data.fileSize, h.options.mediatypes.stored[data.mimeType], function(err, token) {
+							var token = h.signer.signRequest(req.authenticatedUser, path, data.fileSize, data.mimeType, function(err, token) {
 								if (err) {
 									h.responses.error(500, "Internal server error. Please try again later.", res, next);
 									return;
@@ -140,6 +140,7 @@ module.exports = function(h) {
 			res.send(501);
 			return next();
 		},
+		
 		unlock : function(req, res, next) {
 
 			var documentId = req.uriParams.documentId;
