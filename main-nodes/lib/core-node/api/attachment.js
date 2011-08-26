@@ -170,7 +170,7 @@ module.exports = function(h) {
 
 					var path = "/" + documentId + "/" + attachmentId + "." + h.options.mediatypes.stored[doc.mimeType].extension;
 
-					signer.signResponse(201, req.authenticatedUser, path, function(err, expectedToken) {
+					h.signer.signResponse(201, req.authenticatedUser, path, function(err, expectedToken) {
 						console.log(token);
 						console.log(expectedToken);
 						if (err) {
