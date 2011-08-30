@@ -40,6 +40,18 @@ module.exports = function(baseUri) {
 			}
 			return null;
 		},
+		extractBaseTagId : function(uri) {
+			var partial = chopOfBaseUri(uri);
+			if (partial) {
+				var parts = partial.split("/");
+				if (parts.length > 1 && parts[0] === 'tag') {
+					return {
+						baseTagId : parts[1]
+					};
+				}
+			}
+			return null;
+		},
 		
 		generic : function(uri){
 			var partial = chopOfBaseUri(uri);

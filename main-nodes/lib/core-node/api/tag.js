@@ -9,6 +9,11 @@ module.exports = function(h) {
 
 	var TAG_MIN_LENGTH = 2;
 	var TAG_MAX_LENGTH = 64;
+	
+	/*
+	 * ------------------------------ Validation Functions --------------------------------
+	 */
+	
 
 	// returns null if ok, otherwise error
 	var validateBaseTagGeneric = function(tag) {
@@ -47,6 +52,37 @@ module.exports = function(h) {
 			"value" : data.value
 		});
 	};
+	
+	var validateAppendTag = function(data, response, next, callback) {
+		var fail = function(msg) {
+			h.responses.error(400, "Invalid tag. " + (msg || "Please check your entity structure."), response, next);
+		};
+
+		// Check main attributes
+		if (!data || !data.baseTag) {
+			fail("Attributes are missing.");
+			return;
+		}
+		
+		if(!data.baseTag.link || !data.baseTag.link.href || (typeof data.baseTag.link.href !== "string")){
+			fail("Invalid URI.");
+			return;
+		}
+		
+		callback({
+			 "baseTag":{
+			      "link":{
+			         "rel":"self",
+			         "href": data.baseTag.link.href
+			      }
+			   }
+		});
+	};
+	
+	/*
+	 * ------------------------------- -----------------------------------------------------
+	 */
+
 
 	var createBaseTag = function(_tag, creator, callback) {
 		var md5calc = crypto.createHash('md5');
@@ -61,7 +97,7 @@ module.exports = function(h) {
 
 		h.util.dbFetcher.exist(tagId, h.c.BASETAG, function(code) {
 			if (code === 200) {
-				callback(null, successResponse);
+				callback(null, successResponse, true);
 			}
 			else if (code === 404) {
 				var tagDoc = {
@@ -148,12 +184,12 @@ module.exports = function(h) {
 
 		createBasetag : function(req, res, next) {
 			validateBaseTag(req.params, res, next, function(data) {
-				createBaseTag(data.value, req.authenticatedUser, function(err, successResponse) {
+				createBaseTag(data.value, req.authenticatedUser, function(err, successResponse, alreadyExists) {
 					if (err) {
 						h.responses.error(500, "Internal server error.", response, next);
 					}
 					else {
-						res.send(201, successResponse, {
+						res.send((!!alreadyExists ? 202 : 201), successResponse, {
 							Location : successResponse.baseTag.link.href
 						});
 						return next();
@@ -251,9 +287,312 @@ module.exports = function(h) {
 		},
 		
 		appendToDocument : function(req, res, next) {
-			res.send(501);
-			return next();
+			validateAppendTag(req.params, res, next, function(data) {
+				var baseTagId = h.util.uriParser.extractBaseTagId(data.baseTag.link.href).baseTagId;
+				
+				var successUri = h.util.uri.documentTag(req.uriParams.documentId, baseTagId);
+				var successResponse = {
+						link : h.util.link(successUri)
+				}
+				
+				var tagId = h.util.dbHelper.concat(req.uriParams.documentId,baseTagId);
+				h.util.dbFetcher.exist(tagId, h.c.TAG, function(code){
+					if(code === 200){
+						res.send(202, successResponse, {
+							'Location' : successUri
+						});
+						return next();
+					}
+					else if(code === 404){
+						//tag not exists => doc existing?
+						h.util.dbFetcher.exist(req.uriParams.documentId, h.c.DOCUMENT, function(code){
+							if(code === 200){
+								//doc exists => basetag existing?
+								h.util.dbFetcher.fetch(baseTagId, h.c.BASETAG, function(err, baseTagDoc){
+									
+									if (err && err === 404) {
+										h.responses.error(404, "Tag not found.", res, next);
+										return;
+									}
+									else if (err) {
+										h.responses.error(500,"Internal server error.",res,next);
+									}
+									else{
+										var tagDoc = {
+												_id : h.c.TAG.wrap(tagId),
+												type : h.c.TAG.TYPE,
+												tagType : 'document',
+												documentId : req.uriParams.documentId,
+												baseTagId : baseTagId,
+												creator : req.authenticatedUser,
+												creationTime :  new Date().toRFC3339UTCString(),
+												value : baseTagDoc.value
+											};
+											
+											h.db.save(tagDoc._id, tagDoc, function(err, dbRes) {
+
+												if (err) {
+													if (err.error && err.error === 'conflict') {
+														res.send(202, successResponse, {
+															'Location' : successUri
+														});
+														return next();
+													}
+													else {
+														h.responses.error(500,"Internal server error.",res,next);
+													}
+												}
+												else {
+													res.send(201, successResponse, {
+														'Location' : successUri
+													});
+													return next();
+												}
+											});		
+									}
+								});
+							}
+							else if(code === 404){
+								h.responses.error(404,"Document not found.",res,next);
+							}
+							else{
+								h.responses.error(500,"Internal server error.",res,next);
+							}					
+						});
+					}
+					else{
+						h.responses.error(500,"Internal server error.",res,next);
+					}					
+				});
+			});		
+		},		
+		
+		appendToLink : function(req, res, next) {
+			validateAppendTag(req.params, res, next, function(data) {
+				var baseTagId = h.util.uriParser.extractBaseTagId(data.baseTag.link.href).baseTagId;
+				
+				var successUri = h.util.uri.linkTag(req.uriParams.linkId, baseTagId);
+				var successResponse = {
+						link : h.util.link(successUri)
+				}
+				
+				var tagId = h.util.dbHelper.concat(req.uriParams.linkId,baseTagId);
+				h.util.dbFetcher.exist(tagId, h.c.TAG, function(code){
+					if(code === 200){
+						res.send(202, successResponse, {
+							'Location' : successUri
+						});
+						return next();
+					}
+					else if(code === 404){
+						//tag not exists => link existing?
+						h.util.dbFetcher.exist(req.uriParams.linkId, h.c.LINK, function(code){
+							if(code === 200){
+								//link exists => basetag existing?
+								h.util.dbFetcher.fetch(baseTagId, h.c.BASETAG, function(err, baseTagDoc){
+									
+									if (err && err === 404) {
+										h.responses.error(404, "Tag not found.", res, next);
+										return;
+									}
+									else if (err) {
+										h.responses.error(500,"Internal server error.",res,next);
+									}
+									else{
+										var tagDoc = {
+												_id : h.c.TAG.wrap(tagId),
+												type : h.c.TAG.TYPE,
+												tagType : 'link',
+												linkId : req.uriParams.linkId,
+												baseTagId : baseTagId,
+												creator : req.authenticatedUser,
+												creationTime :  new Date().toRFC3339UTCString(),
+												value : baseTagDoc.value
+											};
+											
+										console.log(tagDoc);
+										
+											h.db.save(tagDoc._id, tagDoc, function(err, dbRes) {
+
+												if (err) {
+													if (err.error && err.error === 'conflict') {
+														res.send(202, successResponse, {
+															'Location' : successUri
+														});
+														return next();
+													}
+													else {
+														h.responses.error(500,"Internal server error.",res,next);
+													}
+												}
+												else {
+													res.send(201, successResponse, {
+														'Location' : successUri
+													});
+													return next();
+												}
+											});		
+									}
+								});
+							}
+							else if(code === 404){
+								h.responses.error(404,"Link not found.",res,next);
+							}
+							else{
+								h.responses.error(500,"Internal server error.",res,next);
+							}					
+						});
+					}
+					else{
+						h.responses.error(500,"Internal server error.",res,next);
+					}					
+				});
+			});
 		},
+		
+		
+		forwardDocumentsByTag : function(req, res, next) {
+			h.util.dbPaginator.forward("docs/docs_by_tag", [req.uriParams.tagId], function(row){
+				return row.key[1];
+			},function(err,cursor){
+				if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else if ( cursor === null){
+					res.send(204);
+					return next();
+				}
+				else{
+					var uri = h.util.uri.docsByTagPage(req.uriParams.tagId, cursor);
+					res.send(303, {
+						link :  h.util.link(uri)
+					},{'Location' : uri});
+					return next();
+				}
+			});
+		},
+		
+		listDocumentsByTag : function(req, res, next) {
+			var key = [req.uriParams.tagId, req.uriParams.cursorId];
+			var pageLink = h.util.uri.docsByTagPage;
+			h.util.dbPaginator.getPage("docs/docs_by_tag", key, [req.uriParams.tagId], PAGINATION_SIZE, false, false, function(row){
+				return {
+					key : row.key[1],
+				};
+			}, function(err, result){
+				if(err){
+					res.send(500);
+					next();
+				}
+				else{
+					
+					var list = result.list.map(function(row){
+						return {
+							document : {
+								link : h.util.link(h.util.uri.document(row.key))
+							}
+						};
+					});
+					
+					var related = [];
+					["next", "previous"].forEach(function(e){
+						if(result[e]){
+							console.dir( result[e]);
+							related.push({
+								"link" : h.util.link(pageLink(result[e].key), e)
+							});
+						}
+					});
+					
+					var headers = {};
+					if(result.etag){
+						headers["Etag"] = '"'+result.etag+'"';
+					}
+					
+					res.send(200, {
+						"page" : {
+							"link" : h.util.link(pageLink(req.uriParams.tagId, req.uriParams.cursorId))
+						},
+						"list" :  list,
+						"related" : related
+					},headers);
+					return next();
+				}
+			});
+		},
+		
+		forwardLinksByTag : function(req, res, next) {
+			h.util.dbPaginator.forward("docs/links_by_tag", [req.uriParams.tagId], function(row){
+				return row.key[1];
+			},function(err,cursor){
+				if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else if ( cursor === null){
+					res.send(204);
+					return next();
+				}
+				else{
+					var uri = h.util.uri.linksByTagPage(req.uriParams.tagId, cursor);
+					res.send(303, {
+						link :  h.util.link(uri)
+					},{'Location' : uri});
+					return next();
+				}
+			});
+		},
+		
+		listLinksByTag : function(req, res, next) {
+			var key = [req.uriParams.tagId, req.uriParams.cursorId];
+			var pageLink = h.util.uri.linksByTagPage;
+			h.util.dbPaginator.getPage("docs/links_by_tag", key, [req.uriParams.tagId], PAGINATION_SIZE, false, false, function(row){
+				return {
+					key : row.key[1],
+				};
+			}, function(err, result){
+				if(err){
+					res.send(500);
+					next();
+				}
+				else{
+					
+					var list = result.list.map(function(row){
+						return {
+							document : {
+								link : h.util.link(h.util.uri.link(row.key))
+							}
+						};
+					});
+					
+					var related = [];
+					["next", "previous"].forEach(function(e){
+						if(result[e]){
+							console.dir( result[e]);
+							related.push({
+								"link" : h.util.link(pageLink(result[e].key), e)
+							});
+						}
+					});
+					
+					var headers = {};
+					if(result.etag){
+						headers["Etag"] = '"'+result.etag+'"';
+					}
+					
+					res.send(200, {
+						"page" : {
+							"link" : h.util.link(pageLink(req.uriParams.tagId, req.uriParams.cursorId))
+						},
+						"list" :  list,
+						"related" : related
+					},headers);
+					return next();
+				}
+			});
+		},
+		
+		
+		
 		getAllByDocument : function(req, res, next) {
 			res.send(501);
 			return next();
@@ -262,26 +601,8 @@ module.exports = function(h) {
 			res.send(501);
 			return next();
 		},
-		forwardDocumentsByTag : function(req, res, next) {
-			res.send(501);
-			return next();
-		},
-		listDocumentsByTag : function(req, res, next) {
-			res.send(501);
-			return next();
-		},
-		forwardLinksByTag : function(req, res, next) {
-			res.send(501);
-			return next();
-		},
-		listLinksByTag : function(req, res, next) {
-			res.send(501);
-			return next();
-		},
-		appendToLink : function(req, res, next) {
-			res.send(501);
-			return next();
-		},
+		
+
 		getAllByLink : function(req, res, next) {
 			res.send(501);
 			return next();

@@ -13,6 +13,12 @@ module.exports = function(baseUri){
 		else if(p.userId && p.collectionId && p.documentId){
 			return  baseUri+"/user/"+p.userId+"/collection/"+p.collectionId+"/document/"+p.documentId;
 		}
+		else if(p.documentId && p.tagId){
+			return  baseUri+"/document/"+p.documentId+"/tag/"+p.tagId;;
+		}
+		else if(p.linkId && p.tagId){
+			return  baseUri+"/link/"+p.linkId+"/tag/"+p.tagId;;
+		}
 		else if(p.userId && p.collectionId && p.cursorId){
 			return  baseUri+"/user/"+p.userId+"/collection/"+p.collectionId+"/documents/cursor/"+p.cursorId;
 		}
@@ -36,6 +42,12 @@ module.exports = function(baseUri){
 		}
 		else if(p.linkPageCursorId){
 			return  baseUri+"/links/cursor/"+p.linkPageCursorId;
+		}
+		else if(p.docsByTagCursorId && p.documentId){
+			return  baseUri+"/tag/"+p.docsByTagCursorId+"/documents/cursor/"+p.documentId;
+		}
+		else if(p.linksByTagCursorId && p.linkId){
+			return  baseUri+"/tag/"+p.linksByTagCursorId+"/links/cursor/"+p.linkId;
 		}
 		else if(p.userId && p.userCommentPageCursorId){
 			return  baseUri+"/user/"+p.userId+"/comments/cursor/"+p.userCommentPageCursorId;
@@ -350,6 +362,34 @@ module.exports = function(baseUri){
 			return builder({
 				baseTagId : tag
 			});			
-		}
+		},
+		
+		documentTag : function(document, tag){
+			return builder({
+				documentId : document,
+				tagId : tag
+			});			
+		},	
+		
+		linkTag : function(link, tag){
+			return builder({
+				linkId : link,
+				tagId : tag
+			});			
+		},
+		
+		docsByTagPage : function(tag, document){
+			return builder({
+				documentId : document,
+				docsByTagCursorId : tag
+			});			
+		},
+		
+		linksByTagPage : function(tag, link){
+			return builder({
+				linkId : link,
+				linksByTagCursorId : tag
+			});			
+		},
 	}
 };
