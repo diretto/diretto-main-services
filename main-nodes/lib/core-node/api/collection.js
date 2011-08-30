@@ -71,17 +71,22 @@ module.exports = function(h) {
 		});
 	};
 	
-	
-	var renderCollection = function(colDoc){
+
+		
+	var renderCollection = function(colDoc) {
 		return {
-		      "link": h.util.link(h.util.uri.collection(colDoc.creator, colDoc.collectionId)),
-		       "title":colDoc.title,
-		       "description":colDoc.description,
-		       "creationTime":colDoc.creationTime,
-		       "creator": h.util.link(h.util.uri.user(colDoc.creator)),
-		       "nonpublic":colDoc.nonpublic,
-		       "documents": h.util.link(h.util.uri.collection(colDoc.creator, colDoc.collectionId)+"/documents")
-		    };
+			"link" : h.util.link(h.util.uri.collection(colDoc.creator, colDoc.collectionId)),
+			"title" : colDoc.title,
+			"description" : colDoc.description,
+			"creationTime" : colDoc.creationTime,
+			"creator" : {
+				link : h.util.link(h.util.uri.user(colDoc.creator))
+			},
+			"nonpublic" : colDoc.nonpublic,
+			"documents" : {
+				link : h.util.link(h.util.uri.collection(colDoc.creator, colDoc.collectionId) + "/documents")
+			}
+		};
 	};
 
 	return {

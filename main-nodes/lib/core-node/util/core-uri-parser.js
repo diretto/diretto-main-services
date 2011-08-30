@@ -39,6 +39,45 @@ module.exports = function(baseUri) {
 				}
 			}
 			return null;
+		},
+		
+		generic : function(uri){
+			var partial = chopOfBaseUri(uri);
+			if (partial) {
+				var results = {};
+				var parts = partial.split("/");
+				if (parts.length > 1 && parts[0] === 'document') {
+					results['documentId'] = parts[1]; 
+					if (parts.length > 3 && parts[2] === 'attachment') {
+						results['attachmentId'] = parts[3]; 
+					}
+					else if (parts.length > 3 && parts[2] === 'tag') {
+						results['tagId'] = parts[3]; 
+					}
+					else if (parts.length > 3 && parts[2] === 'comment') {
+						results['commentId'] = parts[3]; 
+					}
+					else if (parts.length > 3 && parts[2] === 'tag') {
+						results['tagId'] = parts[3]; 
+					}
+					else if (parts.length > 3 && parts[2] === 'time') {
+						results['time'] = parts[3]; 
+					}
+					else if (parts.length > 3 && parts[2] === 'location') {
+						results['location'] = parts[3]; 
+					}
+				}
+				else if (parts.length > 1 && parts[0] === 'link') {
+					results['linkId'] = parts[1]; 
+				}
+				else if (parts.length > 1 && parts[0] === 'tag') {
+					results['baseTagId'] = parts[1]; 
+				}
+				
+				return results;
+			}
+			return null;
+			
 		}
 	}
 };

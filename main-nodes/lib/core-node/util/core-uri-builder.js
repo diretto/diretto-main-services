@@ -30,6 +30,9 @@ module.exports = function(baseUri){
 		}
 		else if(p.documentPageCursorId){
 			return  baseUri+"/documents/cursor/"+p.documentPageCursorId;
+		}		
+		else if(p.baseTagListPageId){
+			return  baseUri+"/tags/cursor/"+p.baseTagListPageId;
 		}
 		else if(p.linkPageCursorId){
 			return  baseUri+"/links/cursor/"+p.linkPageCursorId;
@@ -85,6 +88,9 @@ module.exports = function(baseUri){
 		else if(p.userId){
 			return  baseUri+"/user/"+p.userId;
 		}
+		else if(p.baseTagId){
+			return  baseUri+"/tag/"+p.baseTagId;
+		}		
 		else if(p.documentId){
 			return  baseUri+"/document/"+p.documentId;
 		}
@@ -277,6 +283,12 @@ module.exports = function(baseUri){
 			});
 		},
 		
+		baseTagListPage : function(cursor){
+			return builder({
+				baseTagListPageId: cursor,
+			});
+		},
+		
 		collection : function(user, collection){
 			return builder({
 				userId: user,
@@ -332,6 +344,12 @@ module.exports = function(baseUri){
 				queryId: query,
 				page : page
 			});			
-		},			
+		},	
+		
+		baseTag : function(tag){
+			return builder({
+				baseTagId : tag
+			});			
+		}
 	}
 };
