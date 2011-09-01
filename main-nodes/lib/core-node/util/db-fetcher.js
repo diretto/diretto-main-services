@@ -81,7 +81,36 @@ module.exports = function(h) {
 		});
 	};
 	
-	var fetchVotes = function(){
+	var fetchVotes = function(resourceKey, callback){
+		h.db.view('docs/votes', {
+			limit : 1,
+			key : resourceKey,
+			reduce : true,
+			group_level : resourceKey.length
+		}, function(err, dbRes) {
+			console.log(err);
+			console.log(dbRes[0].value);
+			if (dbRes && dbRes.length === 1) {
+				var count = dbRes[0].value.count;
+				var sum = dbRes[0].value.sum;
+				
+				var base = (count - Math.abs(sum)) / 2;
+				var up = base + (sum > 0 ? sum : 0);
+				var down = base + (sum < 0 ? Math.abs(sum) : 0);
+				
+				callback(null, {
+					up : up,
+					down : down
+				});
+				console.log(dbRes);
+			}
+			else if (dbRes) {
+				callback(null, null);
+			}
+			else {
+				callback(err);
+			}
+		});
 		
 	};
 	

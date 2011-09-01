@@ -85,7 +85,7 @@ module.exports = function(h) {
 	
 	
 	var buildResourceId = function(req){
-		var type = idResourceType(req)
+		var type = idResourceType(req);
 		switch (type) {
 			case RESOURCE.ATTACHMENT:
 				return {
@@ -131,13 +131,12 @@ module.exports = function(h) {
 	 * 
 	 */
 	var buildVoteId = function(req){
-		var voteType = idVoteType(req);
-		var resourceType = idVoteType(req);
-		if(!voteType || !resourceType){
+		var resourceType = idResourceType(req);
+		if(!resourceType){
 			return null;
 		}
 		var resId = buildResourceId(req);
-		return h.c.VOTE.wrap(h.util.dbHelper.concat(req.authenticatedUser,resId.type.wrap(resId.id) ));
+		return h.util.dbHelper.concat(req.authenticatedUser,resId.type.wrap(resId.id));
 	};
 	
 	var setResourceProperties = function(req, doc){
@@ -164,11 +163,11 @@ module.exports = function(h) {
 				break;
 			case RESOURCE.TIME:
 				doc['documentId'] = req.uriParams.documentId;
-				doc['location'] = req.uriParams.location;
+				doc['time'] = req.uriParams.time;
 				break;
 			case RESOURCE.LOCATION: 
 				doc['documentId'] = req.uriParams.documentId;
-				doc['time'] = req.uriParams.time;
+				doc['location'] = req.uriParams.location;
 				break;
 			default:
 		}		
@@ -178,17 +177,34 @@ module.exports = function(h) {
 	return {
 
 		getAll : function(req, res, next) {
-			console.dir(idResourceType(req));
-			console.dir(idVoteType(req));
-			console.dir(req.uriParams);
-			res.send(501);
-			return next();
+			
+			h.util.dbFetcher.fetchVotes(["comment", req.uriParams.documentId, req.uriParams.commentId], function(err, votes){
+				console.dir(votes);
+			});
+//			console.dir(idResourceType(req));
+//			console.dir(idVoteType(req));
+//			console.dir(req.uriParams);
+//			res.send(501);
+//			return next();
 		},
 		
 		get : function(req, res, next) {
-			console.dir(req.uriParams);
-			res.send(501);
-			return next();
+			var id = buildVoteId(req);
+			h.util.dbFetcher.fetch(id, h.c.VOTE, function(err, doc){
+				if(err && err === 404){
+					h.responses.error(404, "Vote not found ", res, next);
+				}
+				else if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else{
+					res.send(200, {
+						vote : (doc.vote === 1 ? "up" : "down")
+					});
+					return next();
+					
+				}
+			});
 		},
 		
 		cast : function(req, res, next) {
@@ -205,7 +221,7 @@ module.exports = function(h) {
 			}
 			
 			var voteDoc = {
-					_id : id,
+					_id : h.c.VOTE.wrap(id),
 					type : h.c.VOTE.TYPE,
 					creator : req.authenticatedUser,
 					creationTime : new Date().toRFC3339UTCString(),
@@ -217,22 +233,35 @@ module.exports = function(h) {
 			
 			var resId = buildResourceId(req);
 			
-			console.dir(voteDoc);
-			
-			console.log(resId.id);
 			h.util.dbFetcher.exist(resId.id, resId.type, function(code){
 				if(code === 404){
 					h.responses.error(404, "Votable resource not found ", res, next);
 				}
 				else if(code === 200){
-					//TODO: fetch existing vote, if there
-					h.db.save(voteDoc._id, voteDoc, function(err, dbRes) {
-						if(err){
+					
+					var save = function(){
+						h.db.save(voteDoc._id, voteDoc, function(err, dbRes) {
+							if(err){
+								h.responses.error(500,"Internal server error.",res,next);
+							}
+							else{
+								res.send(202);
+								return next();
+							}
+						});						
+					};
+					
+					//fetch existing vote, if there
+					h.util.dbFetcher.fetch(id,  h.c.VOTE, function(err, doc){
+						if(err && err === 404){
+							save();
+						}
+						else if(err){
 							h.responses.error(500,"Internal server error.",res,next);
 						}
 						else{
-							res.send(202);
-							return next();
+							voteDoc._rev = doc._rev;
+							save();
 						}
 					});
 				}
@@ -244,13 +273,27 @@ module.exports = function(h) {
 		
 		
 		undo : function(req, res, next) {
-			//TODO: build vote ID
-			//TODO: delete vote, if exsting
-			console.dir(idResourceType(req));
-			console.dir(idVoteType(req));
-			console.dir(req.uriParams);
-			res.send(501);
-			return next();
+			var id = buildVoteId(req);
+			h.util.dbFetcher.fetch(id, h.c.VOTE, function(err, doc){
+				if(err && err === 404){
+					h.responses.error(404, "Vote not found ", res, next);
+				}
+				else if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else{
+					h.db.remove(doc._id, doc._rev, function(err) {
+						if (err) {
+							h.responses.error(500, "Internal server error.", res, next);
+							return;
+						}
+						else {
+							res.send(204);
+							return next();
+						}
+					});
+				}
+			});			
 		}
 
 	};
