@@ -23,4 +23,7 @@ function(doc) {
 	  else if (doc.type === "location") {
 		  emit(["document",doc.documentId,"location",(""+doc.lat+","+doc.lon+","+doc.variance)],null);
 	  }
+	  else if (doc.type === "keyvalue") {
+		  emit(["document",doc.documentId,"keyvalue",(""+doc.userId+"-"+doc.key)],null);
+	  }
 };
