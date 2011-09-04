@@ -64,11 +64,11 @@ module.exports = function(h) {
 				else {
 					
 					var key = req.uriParams.key;
-					var userId = req.authenticatedUser;
+					var userId = req.uriParams.userId;
 					var documentId = req.uriParams.documentId;
 					
-					var id = h.util.dbHelper.concat(userId, documentId, key);						
-					
+					var id = h.util.dbHelper.concat(documentId, userId, key);						
+					console.log(id);
 					h.util.dbFetcher.fetch(id, h.c.KEYVALUE, function(err, doc) {
 						if (err && err === 404) {
 							h.responses.error(404, "Key/value not found.", res, next);
@@ -156,7 +156,7 @@ module.exports = function(h) {
 						var userId = req.authenticatedUser;
 						var documentId = req.uriParams.documentId;
 						
-						var id = h.util.dbHelper.concat(userId, documentId, key);						
+						var id = h.util.dbHelper.concat(documentId,userId, key);						
 						
 						h.util.dbFetcher.fetch(id, h.c.KEYVALUE, function(err, doc) {
 							var kvDoc;
@@ -233,7 +233,7 @@ module.exports = function(h) {
 							
 							res.send(200, {
 								values : {
-									link : h.util.link(h.util.uri.document()+"/values"),
+									link : h.util.link(h.util.uri.document(documentId)+"/values"),
 									list : list
 								}
 							});
