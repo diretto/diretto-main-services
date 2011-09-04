@@ -25,6 +25,12 @@ module.exports = function(baseUri){
 		else if(p.documentId && p.userId && p.key){
 			return  baseUri+"/document/"+p.documentId+"/value/"+p.userId+"/"+p.key;
 		}
+		else if(p.documentId && p.commentPageCursorId){
+			return  baseUri+"/document/"+p.documentId+"/comments/cursor/"+p.commentPageCursorId;
+		}
+		else if(p.userId && p.commentPageCursorId){
+			return  baseUri+"/user/"+p.userId+"/comments/cursor/"+p.commentPageCursorId;
+		}
 		else if(p.userId && p.userDocumentPageCursorId){
 			return  baseUri+"/user/"+p.userId+"/documents/cursor/"+p.userDocumentPageCursorId;
 		}
@@ -328,6 +334,20 @@ module.exports = function(baseUri){
 				userId: user,
 				collectionId: collection,
 				cursorId : cursor
+			});
+		},
+		
+		documentCommentsPageCursor  : function(document, cursor){
+			return builder({
+				documentId: document,
+				commentPageCursorId: cursor
+			});
+		},
+		
+		userCommentsPageCursor  : function(user, cursor){
+			return builder({
+				userId: user,
+				commentPageCursorId: cursor
 			});
 		},
 		
