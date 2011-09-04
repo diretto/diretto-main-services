@@ -6,21 +6,21 @@
 function(doc) {
 
 	  if (doc.type === "document" && doc.enabled === true) {
-		  emit([doc._id.substr(2),"document"],null);
+		  emit(["document",doc._id.substr(2),"document",doc._id.substr(2)],null);
 	  }
 	  else if (doc.type === "attachment") {
-		  emit([doc.documentId,"attachment",doc.attachmentId],null);
+		  emit(["document",doc.documentId,"attachment",doc.attachmentId],null);
 	  }
 	  else if (doc.type === "comment") {
-		  emit([doc.documentId,"comment",doc.commentId],null);
+		  emit(["document",doc.documentId,"comment",doc.commentId],null);
 	  }
-	  else if (doc.type === "tag") {
-		  emit([doc.documentId,"tag",doc.tagId],null);
+	  else if (doc.type === "tag" && doc.tagType === "document") {
+		  emit(["document",doc.documentId,"tag",doc.baseTagId],null);
 	  }
 	  else if (doc.type === "time") {
-		  emit([doc.documentId,"time",(""+doc.after+"--"+before)],null);
+		  emit(["document",doc.documentId,"time",(""+doc.after+"--"+doc.before)],null);
 	  }
 	  else if (doc.type === "location") {
-		  emit([doc.documentId,"location",(""+doc.lat+","+doc.lon+","+doc.variance)],null);
+		  emit(["document",doc.documentId,"location",(""+doc.lat+","+doc.lon+","+doc.variance)],null);
 	  }
 };
