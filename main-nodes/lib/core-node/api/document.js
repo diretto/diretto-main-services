@@ -11,17 +11,51 @@ module.exports = function(h) {
 	 * ------------------------------ Validation Functions --------------------------------
 	 */
 	
+	var validateDocumentList = function(data, response, next, callback) {
+		var fail = function(msg) {
+			h.responses.error(400,"Invalid batch request. " + (msg || "Please check your entity structure."),response,next);
+		};		
+		
+		if (!data || !data.documents || !data.documents.length || data.documents.length < 1) {
+			fail("No documents in list.");
+			return;
+		}
+		
+		var entries = {};
+		
+		var validIds = [];
+		var invalidUris = [];
+		
+		data.documents.forEach(function(docUri) {
+			
+			var parsedUri = h.util.uriParser.extractDocumentId(docUri);
+			if(parsedUri){
+				validIds.push(parsedUri.documentId);
+			}
+			else{
+				invalidUris.push(docUri)
+			}
+		});
+		
+		//check for max snapshots allowed
+		if(validIds.length > BATCH_LIMIT){
+			fail("Too many items to fetch. Try again with a maximum of "+BATCH_LIMIT+" items.");
+			return;
+		}		
+		//check for max snapshots allowed
+		if(validIds.length ===0){
+			fail("No valid items listed.");
+			return;
+		}			
+		
+		callback(invalidUris, validIds);
 
+	};
 	
 	/*
 	 * ------------------------------------------------------------------------------------
 	 */
 
-	var renderDocument = function(doc){
-		
-		
-		return {};
-	};
 
 	return {
 
@@ -252,30 +286,6 @@ module.exports = function(h) {
 				}
 			});
 		},
-		getMetdata : function(req, res, next) {
-			res.send(501);
-			return next();
-		},
-		getSnapshot : function(req, res, next) {
-			res.send(501);
-			return next();
-		},
-		getFull : function(req, res, next) {
-			res.send(501);
-			return next();
-		},
-		batchFull : function(req, res, next) {
-			res.send(501);
-			return next();
-		},
-		batchSnapshot : function(req, res, next) {
-			res.send(501);
-			return next();
-		},
-		batchMetadata : function(req, res, next) {
-			res.send(501);
-			return next();
-		},
 		
 		forwardDocuments : function(req, res, next) {
 			h.util.dbPaginator.forward("docs/docs_by_date",[],function(row){
@@ -476,6 +486,101 @@ module.exports = function(h) {
 				}
 			});
 			
-		}
+		},
+		
+		getMetdata : function(req, res, next) {
+			h.util.dbFetcher.fetchDocumentResources(["document",req.uriParams.documentId,"document",req.uriParams.documentId],function(err, result){
+				if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else if(h.util.empty(result)){
+					h.responses.error(404,"Document not found.",res,next);
+				}
+				else{
+					console.dir(result);
+					res.send(200, h.util.renderer.documentMeta(result[req.uriParams.documentId]));
+					return next();
+				}
+			});
+		},
+		
+		getSnapshot : function(req, res, next) {
+			res.send(501);
+			return next();
+		},
+		
+		getFull : function(req, res, next) {
+			h.util.dbFetcher.fetchDocumentResources(["document",req.uriParams.documentId],function(err, result){
+				if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else if(h.util.empty(result)){
+					h.responses.error(404,"Document not found.",res,next);
+				}
+				else{
+					res.send(200, h.util.renderer.documentFull(result[req.uriParams.documentId]));
+					return next();
+				}
+			});
+		},
+		
+		
+		batchFull : function(req, res, next) {
+			res.send(501);
+			return next();
+		},
+		
+		batchSnapshot : function(req, res, next) {
+			res.send(501);
+			return next();
+		},
+		
+		batchMetadata : function(req, res, next) {
+			validateDocumentList(req.params, res,next, function(invalidUris, list){
+				
+				var docList = [];
+				list.forEach(function(docId){
+					docList.push(["document",docId,"document",docId]);
+				});
+				
+				h.util.dbFetcher.fetchDocumentResourcesByKey(docList,function(err, fetchResult){
+					if(err){
+						h.responses.error(500,"Internal server error.",res,next);
+					}
+					else{
+						var results = {};
+						//append invalid uris
+						invalidUris.forEach(function(uri){
+							results[uri] = {
+									error : {
+										reason : "Invalid URI"
+									}
+							}
+						});
+						//append results
+				    	list.forEach(function(docId){
+					    	console.log(docId);
+					    	if(fetchResult[docId] === null || fetchResult[docId]["document"] === null|| fetchResult[docId]["document"][docId] === null){
+						    	//misses
+					    		results[h.util.uri.document(docId)] = {
+					    				error : {
+					    					reason : "Not found"
+					    				}
+					    		}
+					    	}
+						    else{
+						    	//hits
+						    	results[h.util.uri.document(docId)] = h.util.renderer.documentMeta(fetchResult[docId]);
+						    }
+						});
+						
+						res.send(200, {
+							results : results
+						});
+						return next();					
+					}
+				});
+			});
+		},
 	};
 };
