@@ -10,6 +10,7 @@ log.level(restify.LogLevel.Debug);
 var Signer = require('signer');
 var PluginHandler = require('plugin-handler').PluginHandler;
 var registryValidator = require('registry-validator');
+var direttoUtil = require('diretto-util');
 
 module.exports = function(options) {
 
@@ -91,6 +92,8 @@ module.exports = function(options) {
 				}
 			},
 			dbPaginator : require('./util/db-paginator.js')(db),
+			
+			empty : direttoUtil.empty,
 			
 		},
 		
@@ -239,7 +242,7 @@ module.exports = function(options) {
 	server.del('/v2/document/:documentId/attachment/:attachmentId/lock', [ authenticate ], api.attachment.unlock, [ logging ]);
 	server.post('/v2/document/:documentId/attachments', [ authenticate ], api.attachment.create, [ logging ]);
 	server.get('/v2/document/:documentId/attachment/:attachmentId/file', [ authenticate ], api.attachment.forwardAttachment, [ logging ]);
-	server.get('/v2/document/:documentId/attachments/cursor/:cursorId', [ authenticate ], api.attachment.listAttachments, [ logging ]);
+	server.get('/v2/document/:documentId/attachments', [ authenticate ], api.attachment.listAttachments, [ logging ]);
 
 	// Collection
 	server.post('/v2/user/:userId/collection/:collectionId/documents', [ authenticate, authorize ], api.collection.add, [ logging ]);
@@ -266,9 +269,9 @@ module.exports = function(options) {
 	server.get('/v2/document/:documentId', [ authenticate ], api.document.getMetdata, [ logging ]);
 	server.get('/v2/document/:documentId/snapshot', [ authenticate ], api.document.getSnapshot, [ logging ]);
 	server.get('/v2/document/:documentId/full', [ authenticate ], api.document.getFull, [ logging ]);
-	server.get('/v2/documents/full', [ authenticate ], api.document.batchFull, [ logging ]);
-	server.get('/v2/documents/snapshot', [ authenticate ], api.document.batchSnapshot, [ logging ]);
-	server.get('/v2/documents/multiple', [ authenticate ], api.document.batchMetadata, [ logging ]);
+	server.post('/v2/documents/full', [ authenticate ], api.document.batchFull, [ logging ]);
+	server.post('/v2/documents/snapshot', [ authenticate ], api.document.batchSnapshot, [ logging ]);
+	server.post('/v2/documents/multiple', [ authenticate ], api.document.batchMetadata, [ logging ]);
 	server.get('/v2/documents', [ authenticate ], api.document.forwardDocuments, [ logging ]);
 	server.get('/v2/documents/since/:since', [ authenticate ], api.document.forwardSince, [ logging ]);
 	server.get('/v2/documents/cursor/:cursorId', [ authenticate ], api.document.listDocuments, [ logging ]);
