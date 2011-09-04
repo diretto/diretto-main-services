@@ -135,11 +135,6 @@ module.exports = function(h) {
 				});
 			});
 		},
-
-		get : function(req, res, next) {
-			res.send(501);
-			return next();
-		},
 		
 		unlock : function(req, res, next) {
 
@@ -248,9 +243,50 @@ module.exports = function(h) {
 			});
 
 		},
+		
+
+		get : function(req, res, next) {
+			h.util.dbFetcher.fetchDocumentResources(["document",req.uriParams.documentId, "attachment", req.uriParams.attachmentId],function(err, result){
+				if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else if(h.util.empty(result)){
+					h.responses.error(404,"Attachment not found.",res,next);
+				}
+				else{
+					res.send(200, h.util.renderer.attachment(result[req.uriParams.documentId]["attachment"][req.uriParams.attachmentId]));
+					return next();
+				}
+			});
+		},
+		
+		
 		listAttachments : function(req, res, next) {
-			res.send(501);
-			return next();
+			console.log("bla");
+			h.util.dbFetcher.fetchDocumentResources(["document",req.uriParams.documentId, "attachment"],function(err, result){
+				if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else if(h.util.empty(result)){
+					//empty result, so check if document exists at all
+					h.util.dbFetcher.exist(req.uriParams.documentId, h.c.DOCUMENT, function(code){
+						if(code === 200){
+							res.send(200, h.util.renderer.attachmentList(req.uriParams.documentId,{}));
+							return next();
+						}
+						else if(code === 404){
+							h.responses.error(404,"Document not found.",res,next);
+						}
+						else{
+							h.responses.error(500,"Internal server error.",res,next);
+						}
+					});
+				}
+				else{
+					res.send(200, h.util.renderer.attachmentList(req.uriParams.documentId,result[req.uriParams.documentId]["attachment"]));
+					return next();
+				}
+			});
 		}
 
 	};
