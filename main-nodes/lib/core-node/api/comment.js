@@ -1,6 +1,10 @@
 require("rfc3339date");
 
 module.exports = function(h) {
+	
+	var BATCH_LIMIT = h.options.core.parameters.batchLimit || 50;
+	var PAGINATION_SIZE = 2; //h.options.core.parameters.paginationSize || 20;
+
 
 	var COMMENT_MIN_LENGTH = 3;
 	var COMMENT_MAX_LENGTH = 1024;
@@ -39,9 +43,20 @@ module.exports = function(h) {
 	};
 
 	return {
+		
 		get : function(req, res, next) {
-			res.send(501);
-			return next();
+			h.util.dbFetcher.fetchDocumentResources(["document",req.uriParams.documentId, "comment", req.uriParams.commentId],function(err, result){
+				if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else if(h.util.empty(result)){
+					h.responses.error(404,"Comment not found.",res,next);
+				}
+				else{
+					res.send(200, h.util.renderer.comment(result[req.uriParams.documentId]["comment"][req.uriParams.commentId]));
+					return next();
+				}
+			});
 		},
 		
 		create : function(req, res, next) {
@@ -115,8 +130,77 @@ module.exports = function(h) {
 		},
 		
 		listDocumentComments : function(req, res, next) {
-			res.send(501);
-			return next();
+			//fetch cursor doc
+			h.util.dbFetcher.fetch(h.util.dbHelper.concat(req.uriParams.documentId,req.uriParams.cursorId), h.c.COMMENT, function(err,doc){
+				if(err && err === 404){
+					h.responses.error(404,"Cursor not found.",res,next);
+					return;
+				}
+				else if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+					return;
+				}
+				else{
+					var key = [req.uriParams.documentId, doc.creationTime, req.uriParams.cursorId];
+					var pageLink = h.util.uri.documentCommentPage;
+					h.util.dbPaginator.getPage("docs/comments_by_doc", key, [req.uriParams.documentId], PAGINATION_SIZE, false, false, function(row){
+						return {
+							key : row.key[2],
+						};
+					}, function(err, result){
+						if(err){
+							res.send(500);
+							next();
+						}
+						else{
+							
+							var list = result.list.map(function(row){
+								return ["document", req.uriParams.documentId, "comment", row.key];
+							});
+							
+							var related = [];
+							["next", "previous"].forEach(function(e){
+								if(result[e]){
+									console.dir( result[e]);
+									related.push({
+										"link" : h.util.link(pageLink(req.uriParams.documentId, result[e].key), e)
+									});
+								}
+							});
+							
+							var headers = {};
+							if(result.etag){
+								headers["Etag"] = '"'+result.etag+'"';
+							}
+							
+							h.util.dbFetcher.fetchDocumentResourcesByKey(list,function(err, fetchResult){
+								if(err){
+									h.responses.error(500,"Internal server error.",res,next);
+								}
+								else if(h.util.empty(result)){
+									h.responses.error(500,"Internal server error.",res,next);
+								}
+								else{
+									var resultlist = result.list.map(function(row){
+										return h.util.renderer.comment(fetchResult[req.uriParams.documentId]["comment"][row.key]);
+									});
+									
+									console.dir(result);
+									//res.send(200, h.util.renderer.comment(result[req.uriParams.documentId]["comment"][req.uriParams.commentId]));
+									res.send(200,{
+										"page" : {
+											"link" : h.util.link(pageLink(req.uriParams.documentId, req.uriParams.cursorId))
+										},
+										"list" :  resultlist,
+										"related" : related
+									});
+									return next();
+								}
+							});						
+						}
+					});	
+				}
+			});		
 		},
 		
 		forwardUserComments : function(req, res, next) {
@@ -142,9 +226,83 @@ module.exports = function(h) {
 			});		},
 		
 		listUserComments : function(req, res, next) {
-			res.send(501);
-			return next();
+			//fetch cursor doc
+			h.db.view('docs/comments_by_id', {
+				limit : 1,
+				include_docs : true,
+				key : req.uriParams.cursorId,
+			}, function(err, dbRes) {
+				if (dbRes && dbRes.length === 1) {
+					var key = [req.uriParams.userId, dbRes[0].doc.creationTime, req.uriParams.cursorId];
+					var pageLink = h.util.uri.userCommentPage;
+					h.util.dbPaginator.getPage("docs/comments_by_user", key, [req.uriParams.userId], PAGINATION_SIZE, false, false, function(row){
+						return {
+							key : row.key[2],
+							documentId : row.key[3]
+						};
+					}, function(err, result){
+						if(err){
+							res.send(500);
+							next();
+						}
+						else{
+							
+							var list = result.list.map(function(row){
+								return ["document", row.documentId, "comment", row.key];
+							});
+							
+							var related = [];
+							["next", "previous"].forEach(function(e){
+								if(result[e]){
+									console.dir( result[e]);
+									related.push({
+										"link" : h.util.link(pageLink(req.uriParams.userId, result[e].key), e)
+									});
+								}
+							});
+							
+							var headers = {};
+							if(result.etag){
+								headers["Etag"] = '"'+result.etag+'"';
+							}
+							console.dir(list);
+							h.util.dbFetcher.fetchDocumentResourcesByKey(list,function(err, fetchResult){
+								console.dir(fetchResult);
+								if(err){
+									h.responses.error(500,"Internal server error.",res,next);
+								}
+								else if(h.util.empty(fetchResult)){
+									h.responses.error(500,"Internal server error.",res,next);
+								}
+								else{
+									var resultlist = result.list.map(function(row){
+										return h.util.renderer.comment(fetchResult[row.documentId]["comment"][row.key]);
+									});
+									
+									console.dir(result);
+									//res.send(200, h.util.renderer.comment(result[req.uriParams.documentId]["comment"][req.uriParams.commentId]));
+									res.send(200,{
+										"page" : {
+											"link" : h.util.link(pageLink(req.uriParams.userId, req.uriParams.cursorId))
+										},
+										"list" :  resultlist,
+										"related" : related
+									});
+									return next();
+								}
+							});						
+						}
+					});
+				}
+				else if (dbRes) {
+					h.responses.error(404,"Cursor not found.",res,next);
+					return;
+				}
+				else {
+					h.responses.error(500,"Internal server error.",res,next);
+					return;
+				}
+			});			
 		}
-
 	};
 };

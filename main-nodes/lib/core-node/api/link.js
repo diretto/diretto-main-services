@@ -2,7 +2,11 @@ var barrierpoints = require('barrierpoints');
 
 module.exports = function(h) {
 
+	var BATCH_LIMIT = h.options.core.parameters.batchLimit || 50;
+	var PAGINATION_SIZE = 2;// h.options.core.parameters.paginationSize || 20;
+
 	/*
+	 * 
 	 * ------------------------------ Validation Functions
 	 * --------------------------------
 	 */
@@ -180,18 +184,164 @@ module.exports = function(h) {
 			});
 		},
 		
-		listLinks : function(req, res, next) {
-			res.send(501);
-			return next();
-		},
 		get : function(req, res, next) {
-			res.send(501);
-			return next();
+			h.util.dbFetcher.fetchLinkResources(["link",req.uriParams.linkId],function(err, result){
+				if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else if(h.util.empty(result)){
+					h.responses.error(404,"Comment not found.",res,next);
+				}
+				else{
+					res.send(200, h.util.renderer.link(result[req.uriParams.linkId]));
+					return next();
+				}
+			});
 		},
+		
+		listLinks : function(req, res, next) {
+			h.util.dbFetcher.fetch(req.uriParams.cursorId, h.c.LINK, function(err,doc){
+				if(err && err === 404){
+					h.responses.error(404,"Cursor not found.",res,next);
+					return;
+				}
+				else if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+					return;
+				}
+				else{
+					
+					var key = [doc.creationTime, req.uriParams.cursorId];
+					
+					var pageLink = h.util.uri.linkListPage;
+					
+					h.util.dbPaginator.getPage('docs/links_by_date', key, [], PAGINATION_SIZE, false, false, function(row){
+						return {
+							key : row.key[1]
+						};
+					}, function(err, result){
+						if(err){
+							res.send(500);
+						}
+						else{
+							
+							var linkList = result.list.map(function(row){
+								return row.key
+							});
+							
+							var related = [];
+							["next", "previous"].forEach(function(e){
+								if(result[e]){
+									console.dir( result[e]);
+									related.push({
+										"link" : h.util.link(pageLink(result[e].key), e)
+									});
+								}
+							});
+							
+							var headers = {};
+							if(result.etag){
+								headers["Etag"] = '"'+result.etag+'"';
+							}
+							
+							h.util.dbFetcher.fetchMultipleLinksById(linkList,function(err, fetchResult){
+								if(err){
+									h.responses.error(500,"Internal server error.",res,next);
+								}
+								else if(h.util.empty(fetchResult)){
+									h.responses.error(404,"Link not found.",res,next);
+								}
+								else{
+									var resultlist = result.list.map(function(row){
+										return h.util.renderer.link(fetchResult[row.key]);
+									});
+									
+									res.send(200, {
+										"page" : {
+											"link" : h.util.link(pageLink(req.uriParams.cursorId))
+										},
+										"list" :  resultlist,
+										"related" : related
+									},headers);
+									return next();
+								}
+							});
+								
+							
+							
+						}
+					});
+					
+				}
+			});
+		},
+		
 		getDocumentLinks : function(req, res, next) {
-			res.send(501);
-			return next();
+			
+			var responseData = {
+				documentLinks : {
+					link : h.util.link(h.util.uri.document(req.uriParams.documentId)+"/links"),
+					"in" : [],
+					"out" : []			
+				}
+			}
+			
+			h.db.view('docs/links_by_doc', {
+				startkey : [req.uriParams.documentId],
+				endkey : [req.uriParams.documentId,{}]
+			}, function(err, dbRes) {
+				if (dbRes && dbRes.length > 0) {
+					
+					var inLinks = [];
+					var outLinks = [];
+					var linkList = [];
+					
+					for(var i = 0;i<dbRes.length ;i++){
+						if(dbRes[i].key[1] === "in"){
+							inLinks.push(dbRes[i].key[2]);	
+						}
+						else if(dbRes[i].key[1] === "out"){
+							outLinks.push(dbRes[i].key[2]);
+						}
+						linkList.push(dbRes[i].key[2]);
+					}
+					
+					h.util.dbFetcher.fetchMultipleLinksById(linkList,function(err, fetchResult){
+						if(err){
+							h.responses.error(500,"Internal server error.",res,next);
+						}
+						else if(h.util.empty(fetchResult)){
+							h.responses.error(404,"Link not found.",res,next);
+						}
+						else{
+							
+							inLinks.forEach(function(id){
+								console.log(h.util.renderer.link(fetchResult[id]));
+								responseData.documentLinks["in"].push(h.util.renderer.link(fetchResult[id]));
+							});
+							outLinks.forEach(function(id){
+								console.log(h.util.renderer.link(fetchResult[id]));
+								responseData.documentLinks["out"].push(h.util.renderer.link(fetchResult[id]));
+							});
+							res.send(200, responseData);
+							return next();
+						}
+					});
+					
+					
+					
+				}
+				else if (dbRes) {
+					res.send(200, responseData);
+					return next();
+				}
+				else {
+					h.responses.error(500,"Internal server error.",res,next);
+					return;
+				}
+			});
 		}
+		
 
 	};
 };

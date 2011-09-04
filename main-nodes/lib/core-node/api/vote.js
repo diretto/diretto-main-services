@@ -113,14 +113,27 @@ module.exports = function(h) {
 					id : h.util.dbHelper.concat(req.uriParams.linkId)	
 				}; 
 			case RESOURCE.TIME:
+				var dateRange = req.uriParams.time;
+				var dates = dateRange.split("--");
+				if(dates.length !== 2 || !h.util.commonValidator.validateDate(dates[0]) || !h.util.commonValidator.validateDate(dates[1])){
+					return null;
+				}				
 				return {
 					type : h.c.TIME,
-					id : h.util.dbHelper.concat(req.uriParams.documentId,req.uriParams.time)	
+					id : h.util.dbHelper.concat(req.uriParams.documentId,h.util.dbHelper.createTimeId(dates[1], dates[0]))	
 				}; 
 			case RESOURCE.LOCATION: 
+				var location = req.uriParams.location;
+				var locParts = location.split(",");
+				if(locParts.length !== 3 || !h.util.commonValidator.validateLocationValues(locParts[0],locParts[1],locParts[2])){
+					return null;
+				}
+				var lat = locParts[0];
+				var lon = locParts[1];
+				var variance = locParts[2];
 				return {
 					type : h.c.LOCATION,
-					id : h.util.dbHelper.concat(req.uriParams.documentId,req.uriParams.location)	
+					id : h.util.dbHelper.concat(req.uriParams.documentId, h.util.dbHelper.createLocationId(lat,lon,variance))	
 				}; 
 			default:
 				return null;
@@ -178,14 +191,89 @@ module.exports = function(h) {
 
 		getAll : function(req, res, next) {
 			
-			h.util.dbFetcher.fetchVotes(["comment", req.uriParams.documentId, req.uriParams.commentId], function(err, votes){
-				console.dir(votes);
+			var resourceUri = "";
+			var key = null;
+
+			switch (idResourceType(req)) {
+				case RESOURCE.ATTACHMENT: 
+					resourceUri = h.util.uri.attachment(req.uriParams.documentId,req.uriParams.attachmentId);
+					key = ["document",req.uriParams.documentId,"attachment",req.uriParams.attachmentId]
+					break;
+				case RESOURCE.COMMENT: 
+					resourceUri = h.util.uri.comment(req.uriParams.documentId,req.uriParams.commentId);
+					key = ["document",req.uriParams.documentId,"comment",req.uriParams.commentId]
+					break;
+				case RESOURCE.DOCUMENTTAG: 
+					resourceUri = h.util.uri.documentTag(req.uriParams.documentId,req.uriParams.tagId);
+					key = ["document",req.uriParams.documentId,"tag",req.uriParams.tagId]
+					break;
+				case RESOURCE.TIME:
+					var dates = req.uriParams.time.split("--");
+					resourceUri = h.util.uri.documentTime(req.uriParams.documentId,dates[0] ||0,dates[1]||0);
+					key = ["document",req.uriParams.documentId,"time",req.uriParams.time]
+					break;
+				case RESOURCE.LOCATION: 
+					var locs = req.uriParams.location.split(",");
+					resourceUri = h.util.uri.documentLocation(req.uriParams.documentId,locs[0]||0,locs[1]||0,locs[2]||0);
+					key = ["document",req.uriParams.documentId,"location",req.uriParams.location]
+					break;
+				case RESOURCE.LINKTAG: 
+					resourceUri = h.util.uri.linkTag(req.uriParams.linkId,req.uriParams.tagId);
+					key = ["link",req.uriParams.linkId,"tag",req.uriParams.tagId]
+					break;
+				case RESOURCE.LINK:
+					resourceUri = h.util.uri.link(req.uriParams.linkId);
+					key = ["link",req.uriParams.linkId,"link",req.uriParams.linkId]
+					break;
+				default:
+					h.responses.error(404,"Unknown resource.",res,next);
+					return;
+					break;
+			}
+			
+			resourceUri = resourceUri+"/votes";
+			
+			
+			h.util.dbFetcher.fetchVotes(key, function(err, votes){				
+				if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else if(votes === null){
+					//check if resource exists
+					var resId = buildResourceId(req);
+										
+					h.util.dbFetcher.exist(resId.id, resId.type, function(code){
+						if(code === 404){
+							h.responses.error(404, "Votable resource not found ", res, next);
+						}
+						else if(code === 200){
+							res.send(200, {
+								votes : {
+									link : h.util.link(resourceUri),
+									up : 0,
+									down : 0,
+								}
+							
+							});
+							return next();
+						}
+						else{
+							h.responses.error(500,"Internal server error.",res,next);
+						}
+					});
+				}
+				else{
+					res.send(200, {
+						votes : {
+							link : h.util.link(resourceUri),
+							up : votes.up,
+							down : votes.down,
+						}
+					
+					});
+					return next();
+				}
 			});
-//			console.dir(idResourceType(req));
-//			console.dir(idVoteType(req));
-//			console.dir(req.uriParams);
-//			res.send(501);
-//			return next();
 		},
 		
 		get : function(req, res, next) {
@@ -220,6 +308,8 @@ module.exports = function(h) {
 				h.responses.error(400, "Invalid vote type ", res, next);
 			}
 			
+			
+			
 			var voteDoc = {
 					_id : h.c.VOTE.wrap(id),
 					type : h.c.VOTE.TYPE,
@@ -233,9 +323,11 @@ module.exports = function(h) {
 			
 			var resId = buildResourceId(req);
 			
+			console.dir(resId);
+			
 			h.util.dbFetcher.exist(resId.id, resId.type, function(code){
 				if(code === 404){
-					h.responses.error(404, "Votable resource not found ", res, next);
+					h.responses.error(404, "Votable resourcex not found ", res, next);
 				}
 				else if(code === 200){
 					

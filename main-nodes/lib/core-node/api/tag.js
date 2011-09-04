@@ -213,7 +213,7 @@ module.exports = function(h) {
 					return;
 				}				
 				else{
-					res.send(200, h.util.renderer.renderBaseTag(doc));
+					res.send(200, h.util.renderer.baseTag(doc));
 					next();
 				}
 			});
@@ -256,7 +256,7 @@ module.exports = function(h) {
 				else{
 					
 					var list = result.list.map(function(row){
-						return h.util.renderer.renderBaseTag(row.doc);
+						return h.util.renderer.baseTag(row.doc);
 					});
 					
 					var related = [];
@@ -594,22 +594,88 @@ module.exports = function(h) {
 		
 		
 		getAllByDocument : function(req, res, next) {
-			res.send(501);
-			return next();
+			h.util.dbFetcher.fetchDocumentResources(["document",req.uriParams.documentId, "tag"],function(err, result){
+				if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else if(h.util.empty(result)){
+					//empty result, so check if document exists at all
+					h.util.dbFetcher.exist(req.uriParams.documentId, h.c.DOCUMENT, function(code){
+						if(code === 200){
+							res.send(200, h.util.renderer.documentTagList(req.uriParams.documentId,{}));
+							return next();
+						}
+						else if(code === 404){
+							h.responses.error(404,"Document not found.",res,next);
+						}
+						else{
+							h.responses.error(500,"Internal server error.",res,next);
+						}
+					});
+				}
+				else{
+					res.send(200, h.util.renderer.documentTagList(req.uriParams.documentId,result[req.uriParams.documentId]["tag"]));
+					return next();
+				}
+			});
 		},
+		
 		getByDocument : function(req, res, next) {
-			res.send(501);
-			return next();
+			h.util.dbFetcher.fetchDocumentResources(["document",req.uriParams.documentId, "tag", req.uriParams.tagId],function(err, result){
+				if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else if(h.util.empty(result)){
+					h.responses.error(404,"Tag not found.",res,next);
+				}
+				else{
+					res.send(200, h.util.renderer.documentTag(result[req.uriParams.documentId]["tag"][req.uriParams.tagId]));
+					return next();
+				}
+			});
 		},
 		
 
 		getAllByLink : function(req, res, next) {
-			res.send(501);
-			return next();
+			h.util.dbFetcher.fetchLinkResources(["link",req.uriParams.linkId, "tag"],function(err, result){
+				if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else if(h.util.empty(result)){
+					//empty result, so check if document exists at all
+					h.util.dbFetcher.exist(req.uriParams.documentId, h.c.DOCUMENT, function(code){
+						if(code === 200){
+							res.send(200, h.util.renderer.linkTagList(req.uriParams.linkId,{}));
+							return next();
+						}
+						else if(code === 404){
+							h.responses.error(404,"Link not found.",res,next);
+						}
+						else{
+							h.responses.error(500,"Internal server error.",res,next);
+						}
+					});
+				}
+				else{
+					res.send(200, h.util.renderer.linkTagList(req.uriParams.linkId,result[req.uriParams.linkId]["tag"]));
+					return next();
+				}
+			});
 		},
+		
 		getByLink : function(req, res, next) {
-			res.send(501);
-			return next();
+			h.util.dbFetcher.fetchLinkResources(["link",req.uriParams.linkId, "tag", req.uriParams.tagId],function(err, result){
+				if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else if(h.util.empty(result)){
+					h.responses.error(404,"Tag not found.",res,next);
+				}
+				else{
+					res.send(200, h.util.renderer.linkTag(result[req.uriParams.linkId]["tag"][req.uriParams.tagId]));
+					return next();
+				}
+			});
 		}
 
 	};

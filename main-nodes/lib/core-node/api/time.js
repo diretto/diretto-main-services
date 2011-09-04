@@ -11,10 +11,7 @@ module.exports = function(h) {
 	
 	return {
 
-		get : function(req, res, next) {
-			res.send(501);
-			return next();
-		},
+		
 		create : function(req, res, next) {
 			var dateRange = req.uriParams.time;
 			var dates = dateRange.split("--");
@@ -91,11 +88,51 @@ module.exports = function(h) {
 			});
 
 		},
+		
+		get : function(req, res, next) {
+			h.util.dbFetcher.fetchDocumentResources(["document",req.uriParams.documentId, "time", req.uriParams.time],function(err, result){
+				if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else if(h.util.empty(result)){
+					h.responses.error(404,"Time not found.",res,next);
+				}
+				else{
+					res.send(200, h.util.renderer.time(result[req.uriParams.documentId]["time"][req.uriParams.time]));
+					return next();
+				}
+			});
+		},
+		
 		getAll : function(req, res, next) {
-			res.send(501);
-			return next();
+			h.util.dbFetcher.fetchDocumentResources(["document",req.uriParams.documentId, "time"],function(err, result){
+				if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else if(h.util.empty(result)){
+					//empty result, so check if document exists at all
+					h.util.dbFetcher.exist(req.uriParams.documentId, h.c.DOCUMENT, function(code){
+						if(code === 200){
+							res.send(200, h.util.renderer.timeList(req.uriParams.documentId,{}));
+							return next();
+						}
+						else if(code === 404){
+							h.responses.error(404,"Document not found.",res,next);
+						}
+						else{
+							h.responses.error(500,"Internal server error.",res,next);
+						}
+					});
+				}
+				else{
+					res.send(200, h.util.renderer.timeList(req.uriParams.documentId,result[req.uriParams.documentId]["time"]));
+					return next();
+				}
+			});
 		}
 		
 
+		
+		
 	};
 };
