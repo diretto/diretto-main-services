@@ -486,7 +486,12 @@ cradle.Connection.prototype.database = function (name) {
             }
 
             if (options && options.keys) {
-                this.query('POST', path, {}, options, args.callback);
+            	
+            	var keys = options.keys;
+            	delete options['keys'];
+            	
+            	
+                this.query('POST', path, options, {keys : keys} , args.callback);
             } else {
                 this.query('GET', path, options, args.callback);
             }
