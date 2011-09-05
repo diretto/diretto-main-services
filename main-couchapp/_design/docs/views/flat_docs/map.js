@@ -23,4 +23,8 @@ function(doc) {
 	  else if (doc.type === "location") {
 		  emit(doc.documentId, ["document",doc.documentId, "location",(""+doc.lat+","+doc.lon+","+doc.variance)]);
 	  }
+	  else if (doc.type === "link") {
+		  emit(doc.source.documentId,["document",doc.source.documentId,"link",doc.linkId]);
+		  emit(doc.destination.documentId,["document",doc.destination.documentId,"link",doc.linkId]);
+	  }
 };

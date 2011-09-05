@@ -26,4 +26,8 @@ function(doc) {
 	  else if (doc.type === "keyvalue") {
 		  emit(["document",doc.documentId,"keyvalue",(""+doc.userId+"-"+doc.key)],null);
 	  }
+	  else if (doc.type === "link") {
+		  emit(["document",doc.source.documentId,"link",doc.linkId],null);
+		  emit(["document",doc.destination.documentId,"link",doc.linkId],null);
+	  }
 };
