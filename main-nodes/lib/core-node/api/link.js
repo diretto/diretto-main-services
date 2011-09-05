@@ -190,7 +190,7 @@ module.exports = function(h) {
 					h.responses.error(500,"Internal server error.",res,next);
 				}
 				else if(h.util.empty(result)){
-					h.responses.error(404,"Comment not found.",res,next);
+					h.responses.error(404,"Link not found.",res,next);
 				}
 				else{
 					res.send(200, h.util.renderer.link(result[req.uriParams.linkId]));

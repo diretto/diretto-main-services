@@ -504,11 +504,6 @@ module.exports = function(h) {
 			});
 		},
 		
-		getSnapshot : function(req, res, next) {
-			res.send(501);
-			return next();
-		},
-		
 		getFull : function(req, res, next) {
 			h.util.dbFetcher.fetchDocumentResources(["document",req.uriParams.documentId],function(err, result){
 				if(err){
@@ -518,23 +513,104 @@ module.exports = function(h) {
 					h.responses.error(404,"Document not found.",res,next);
 				}
 				else{
-					res.send(200, h.util.renderer.documentFull(result[req.uriParams.documentId]));
-					return next();
+					
+					//fetch link documents, if available
+					var linkList = [];
+					if(result[req.uriParams.documentId]["link"]){
+						for(var idx in result[req.uriParams.documentId]["link"]){
+							linkList.push(idx);
+						}
+					}
+					
+					h.util.dbFetcher.fetchMultipleLinksById(linkList,function(err, linkFetchResult){
+						if(err){
+							h.responses.error(500,"Internal server error.",res,next);
+						}
+						else{							
+							res.send(200, h.util.renderer.documentFull(result[req.uriParams.documentId],linkFetchResult));
+							return next();
+						}
+					});
 				}
 			});
 		},
 		
 		
 		batchFull : function(req, res, next) {
-			res.send(501);
-			return next();
+			validateDocumentList(req.params, res,next, function(invalidUris, docList){
+				
+				h.util.dbFetcher.fetchMultipleDocsById(docList,function(err, fetchResult){
+					if(err){
+						h.responses.error(500,"Internal server error.",res,next);
+					}
+					else{
+						
+						var results = {};
+						var linkSet = {};
+						
+						//append invalid uris
+						invalidUris.forEach(function(uri){
+							results[uri] = {
+									error : {
+										reason : "Invalid URI"
+									}
+							}
+						});
+						docList.forEach(function(docId){
+					    	if(!(fetchResult[docId] === null || fetchResult[docId]["document"] === null|| fetchResult[docId]["document"][docId] === null)){
+						    	if(fetchResult[docId]["link"]){
+									for(var idx in fetchResult[docId]["link"]){
+										linkSet[idx] = true;
+									}
+								}
+						    }
+						});
+						
+						var linkList = [];
+						for(var idx in linkSet){
+							if(linkSet.hasOwnProperty(idx)){
+								linkList.push(idx);
+							}
+						}
+						
+						h.util.dbFetcher.fetchMultipleLinksById(linkList,function(err, linkFetchResult){
+							if(err){
+								h.responses.error(500,"Internal server error.",res,next);
+							}
+							else{	
+
+								//append results
+								docList.forEach(function(docId){
+							    	if(fetchResult[docId] === null || fetchResult[docId]["document"] === null|| fetchResult[docId]["document"][docId] === null){
+								    	//misses
+							    		results[h.util.uri.document(docId)] = {
+							    				error : {
+							    					reason : "Not found"
+							    				}
+							    		}
+							    	}
+								    else{
+								    	//hits
+								    	results[h.util.uri.document(docId)] = h.util.renderer.documentFull(fetchResult[docId],linkFetchResult);
+								    }
+
+								});
+								
+								
+								res.send(200, {
+									results : results
+								});
+								return next();		
+							}
+						});
+						
+						
+								
+					}
+				});
+			});
 		},
-		
-		batchSnapshot : function(req, res, next) {
-			res.send(501);
-			return next();
-		},
-		
+
 		batchMetadata : function(req, res, next) {
 			validateDocumentList(req.params, res,next, function(invalidUris, list){
 				
@@ -560,7 +636,7 @@ module.exports = function(h) {
 						//append results
 				    	list.forEach(function(docId){
 					    	console.log(docId);
-					    	if(fetchResult[docId] === null || fetchResult[docId]["document"] === null|| fetchResult[docId]["document"][docId] === null){
+					    	if(!fetchResult[docId]  || !fetchResult[docId]["document"] || !fetchResult[docId]["document"][docId]){
 						    	//misses
 					    		results[h.util.uri.document(docId)] = {
 					    				error : {
@@ -582,5 +658,71 @@ module.exports = function(h) {
 				});
 			});
 		},
+		
+		getSnapshot : function(req, res, next) {
+			h.util.dbFetcher.fetchMultipleDocSnapshotsById([req.uriParams.documentId],function(err, fetchResult){
+				if(err){
+					h.responses.error(500,"Internal server error.",res,next);
+				}
+				else if(h.util.empty(fetchResult)){
+					h.responses.error(404,"Document not found.",res,next);
+				}
+				else{
+					console.dir(fetchResult);
+					res.send(200, h.util.renderer.documentSnapshot(fetchResult[req.uriParams.documentId]));
+					return next();
+				}
+			});
+		},
+		
+		batchSnapshot : function(req, res, next) {
+			validateDocumentList(req.params, res,next, function(invalidUris, docList){
+				
+				h.util.dbFetcher.fetchMultipleDocsById(docList,function(err, fetchResult){
+					if(err){
+						h.responses.error(500,"Internal server error.",res,next);
+					}
+					else{
+						
+						var results = {};
+						
+						//append invalid uris
+						invalidUris.forEach(function(uri){
+							results[uri] = {
+									error : {
+										reason : "Invalid URI"
+									}
+							}
+						});
+						//append results
+						docList.forEach(function(docId){
+							console.log(fetchResult);
+					    	if(!fetchResult[docId]  || !fetchResult[docId]["document"] || !fetchResult[docId]["document"][docId]){
+						    	//misses
+					    		results[h.util.uri.document(docId)] = {
+					    				error : {
+					    					reason : "Not found"
+					    				}
+					    		}
+					    	}
+						    else{
+						    	//hits
+						    	results[h.util.uri.document(docId)] = h.util.renderer.documentSnapshot(fetchResult[docId]);
+						    }
+
+						});
+				
+												
+						
+						res.send(200, {
+							results : results
+						});
+						return next();		
+								
+					}
+				});
+			});
+		},
+		
 	};
 };

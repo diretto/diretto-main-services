@@ -88,8 +88,6 @@ module.exports = function(h) {
 			reduce : true,
 			group_level : resourceKey.length
 		}, function(err, dbRes) {
-			console.log(err);
-			console.log(dbRes);
 			if (dbRes && dbRes.length === 1) {
 				var count = dbRes[0].value.count;
 				var sum = dbRes[0].value.sum;
@@ -102,7 +100,6 @@ module.exports = function(h) {
 					up : up,
 					down : down
 				});
-				console.log(dbRes);
 			}
 			else if (dbRes) {
 				callback(null, null);
@@ -226,8 +223,6 @@ module.exports = function(h) {
 		
 		var b = barrierpoints(2, function() {
 			
-//			console.dir(votes);
-//			console.dir(docs);
 			
 			//iterate over docs, add vote if available, or empty vote set
 			var result = {};
@@ -344,6 +339,10 @@ module.exports = function(h) {
 	var fetchMultipleLinksById = function(list, callback){
 		fetchMultipleResources(list, 'docs/flat_links','docs/complex_links', callback);
 	};
+
+	var fetchMultipleDocSnapshotsById = function(list, callback){
+		fetchMultipleResources(list, 'docs/flat_snapshots','docs/complex_docs', callback);
+	};
 	
 
 	return {
@@ -362,6 +361,7 @@ module.exports = function(h) {
 		fetchLinkResourcesByKey : fetchLinkResourcesByKey,
 		
 		fetchMultipleDocsById : fetchMultipleDocsById,
-		fetchMultipleLinksById : fetchMultipleLinksById 
+		fetchMultipleLinksById : fetchMultipleLinksById,
+		fetchMultipleDocSnapshotsById : fetchMultipleDocSnapshotsById
 	};
 };

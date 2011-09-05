@@ -1,7 +1,6 @@
 module.exports = function(h) {
 	
 	var location = function(l){
-// console.dir(l);
 		return{
 			location : {
 				   link : h.util.link(h.util.uri.documentLocation(l.doc.documentId, l.doc.lat, l.doc.lon, l.doc.variance)),
@@ -112,7 +111,6 @@ module.exports = function(h) {
 	};
 	
 	var documentTag = function(d){
-		console.dir(d);
 		return tag(d, h.util.uri.documentTag(d.doc.documentId, d.doc.baseTagId));
 	};
 	
@@ -171,8 +169,6 @@ module.exports = function(h) {
 	
 	var link = function(d){
 		
-		console.dir(d);
-		
 		var linkId;
 		for(var idx in d.link){
 			if(d.link.hasOwnProperty(idx)){
@@ -180,9 +176,6 @@ module.exports = function(h) {
 			}
 		}
 		var linkDoc = d["link"][linkId];
-		
-		console.dir(linkDoc);
-		
 		
 		var result = {
 		   "documentLink":{
@@ -438,7 +431,107 @@ module.exports = function(h) {
 			if(d.keyvalue.hasOwnProperty(idx)){
 				result.document.values.list.push(keyvalue(d["keyvalue"][idx]));
 			}
+		}	
+		
+		//inject links
+		for(var idx in l){
+			if(l.hasOwnProperty(idx)){
+				var linkItem = l[idx]["link"][idx];
+				
+				if(linkItem.doc.source.documentId === documentId){
+					result.document.documentLinks.out.push(link(l[idx]));
+				}
+				else if(linkItem.doc.destination.documentId === documentId){
+					result.document.documentLinks["in"].push(link(l[idx]));
+				}
+			}
 		}		
+		return result;
+	};
+	
+	var documentSnapshot = function(d){
+		
+		var documentId;
+		for(var idx in d.document){
+			if(d.document.hasOwnProperty(idx)){
+				documentId = idx;
+			}
+		}
+		var item = d["document"][documentId];
+		
+		var docUri = h.util.uri.document(documentId)
+		
+		var result = {
+			"document":{
+		      "link":h.util.link(docUri),
+		      "mediaType":item.doc.mediaType,
+		      "publishedTime":item.doc.publishedTime,
+		      "publisher":{
+			         "link":h.util.link(h.util.uri.user(item.doc.publisher)),
+			      },
+		      "title":item.doc.title,
+		      "description":item.doc.description,
+		      "comments":{
+			      "link":h.util.link(docUri+"/comments"),
+		      },
+		      "tags":{
+			      "link":h.util.link(docUri+"/tags"),
+			      "list" : []
+		      },
+		      "attachments":{
+			      "link":h.util.link(docUri+"/attachments"),
+		      },
+		      "locations":{
+			      "link":h.util.link(docUri+"/locations"),
+		      },
+		      "times":{
+			      "link":h.util.link(docUri+"/times"),
+		      },
+		      "values":{
+			      "link":h.util.link(docUri+"/values"),
+		      },
+		      "documentLinks":{
+			      "link":h.util.link(docUri+"/links"),
+		      }
+		   }
+		};
+		
+		for(var idx in d.tag){
+			if(d.tag.hasOwnProperty(idx)){
+				result.document.tags.list.push(documentTag(d["tag"][idx]));
+			}
+		}
+		
+		var attachmentId = null;
+		for(var idx in d.attachment){
+			if(d.attachment.hasOwnProperty(idx)){
+				attachmentId = idx;
+			}
+		}		
+		var locationId = null;
+		for(var idx in d.location){
+			if(d.location.hasOwnProperty(idx)){
+				locationId = idx;
+			}
+		}		
+		var timeId = null;
+		for(var idx in d.time){
+			if(d.time.hasOwnProperty(idx)){
+				timeId = idx;
+			}
+		}
+		
+
+		result.document.snapshot = {};
+		if(attachmentId && d.attachment[attachmentId]){
+			result.document.snapshot.attachment = attachment(d.attachment[attachmentId]).attachment;
+		}
+		if(timeId && d.time[timeId]){
+			result.document.snapshot.time = time(d.time[timeId]).time;
+		}
+		if(locationId && d.location[locationId]){
+			result.document.snapshot.location = location(d.location[locationId]).location;
+		}
 		return result;
 	};
 	
@@ -466,5 +559,6 @@ module.exports = function(h) {
 		
 		documentMeta : documentMeta,
 		documentFull : documentFull,
+		documentSnapshot : documentSnapshot
 	};
 };

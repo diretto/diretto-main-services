@@ -262,7 +262,6 @@ module.exports = function(h) {
 		
 		
 		listAttachments : function(req, res, next) {
-			console.log("bla");
 			h.util.dbFetcher.fetchDocumentResources(["document",req.uriParams.documentId, "attachment"],function(err, result){
 				if(err){
 					h.responses.error(500,"Internal server error.",res,next);
@@ -288,6 +287,5 @@ module.exports = function(h) {
 				}
 			});
 		}
-
 	};
 };

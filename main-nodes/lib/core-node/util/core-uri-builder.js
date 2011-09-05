@@ -68,7 +68,7 @@ module.exports = function(baseUri){
 			return  baseUri+"/document/"+p.documentId+"/time/"+p.after+"--"+p.before;
 		}		
 		else if(p.documentId && p.lat && p.lon && p.variance){
-			return  baseUri+"/document/"+p.documentId+"/time/"+p.lat+","+p.lon+","+p.variance;
+			return  baseUri+"/document/"+p.documentId+"/location/"+p.lat+","+p.lon+","+p.variance;
 		}		
 		else if(p.queryId && p.page){
 			return  baseUri+"/query/stored/"+p.queryId+"/cursor/"+p.page;
