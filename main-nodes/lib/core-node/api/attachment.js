@@ -194,6 +194,13 @@ module.exports = function(h) {
 										});
 									}
 								});
+								h.util.dbFetcher.fetch(documentId, h.c.SNAPSHOT, function(err, doc) {
+									if (!err) {
+										doc.enabled = true;
+										h.db.save(doc._id, doc, function(err) {
+										});
+									}
+								});
 							}
 						}
 					});

@@ -156,7 +156,7 @@ module.exports = function(h) {
 							lon : data.location.position.coordinates[0],
 							variance : data.location.variance 
 						},
-						enabled : false
+						enabled : (stored ? false : true)
 				};
 				
 				var saveDocument = function(callback){					
