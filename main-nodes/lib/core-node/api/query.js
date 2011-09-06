@@ -25,11 +25,11 @@ module.exports = function(h) {
 		}
 		
 		if(!data.query.location || !data.query.location.bbox || !data.query.location.bbox.length || data.query.location.bbox.length !== 4){
-			fail("Invalid time.");
+			fail("Invalid location.");
 			return;
 		}
 		
-		if(data.query.tags === undefined || (data.query.tags !== null && (!data.query.tags.length))){
+		if(data.query.tags === undefined || (data.query.tags !== null && (data.query.tags.length === undefined))){
 			fail("Invalid tag list.");
 			return;
 		}		
