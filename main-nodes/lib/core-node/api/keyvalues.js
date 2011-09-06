@@ -68,7 +68,6 @@ module.exports = function(h) {
 					var documentId = req.uriParams.documentId;
 					
 					var id = h.util.dbHelper.concat(documentId, userId, key);						
-					console.log(id);
 					h.util.dbFetcher.fetch(id, h.c.KEYVALUE, function(err, doc) {
 						if (err && err === 404) {
 							h.responses.error(404, "Key/value not found.", res, next);
@@ -178,8 +177,6 @@ module.exports = function(h) {
 							}
 							
 							kvDoc.value = data.value;
-							
-							console.dir(kvDoc);
 							
 							h.db.save(kvDoc._id, kvDoc, function(err) {
 								if (err) {

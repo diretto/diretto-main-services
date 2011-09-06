@@ -145,7 +145,6 @@ module.exports = function(h) {
 						return;
 					}
 					else {
-						console.dir(code);
 						h.responses.error(500,"Internal server error. Please try again later.",res,next);
 						return;						
 					}
@@ -208,8 +207,6 @@ module.exports = function(h) {
 					return next();
 				}
 				else{
-					console.dir(cursor);
-					
 					var uri = (type === IN ? h.util.uri.inboxMessagePage(req.authenticatedUser,cursor) : h.util.uri.outboxMessagePage(req.authenticatedUser,cursor)); 
 					res.send(303, {
 						link :  h.util.link(uri)
@@ -237,8 +234,6 @@ module.exports = function(h) {
 					return next();
 				}
 				else{
-					console.dir(cursor);
-					
 					var uri = (type === IN ? h.util.uri.inboxMessagePage(req.authenticatedUser,cursor) : h.util.uri.outboxMessagePage(req.authenticatedUser,cursor)); 
 					res.send(303, {
 						link :  h.util.link(uri)
@@ -289,7 +284,6 @@ module.exports = function(h) {
 							var related = [];
 							["next", "previous"].forEach(function(e){
 								if(result[e]){
-									console.dir( result[e]);
 									related.push({
 										"link" : h.util.link(pageLink(req.authenticatedUser, result[e].key), e)
 									});

@@ -5,7 +5,7 @@ var barrierpoints = require('barrierpoints');
 module.exports = function(h) {
 	
 	var BATCH_LIMIT = h.options.core.parameters.batchLimit || 50;
-	var PAGINATION_SIZE = 2; //h.options.core.parameters.paginationSize || 20;
+	var PAGINATION_SIZE = h.options.core.parameters.paginationSize || 20;
 	
 	/*
 	 * ------------------------------ Validation Functions --------------------------------
@@ -208,15 +208,12 @@ module.exports = function(h) {
 							return;
 						}
 						else {
-							console.dir(code);
 							h.responses.error(500,"Internal server error. Please try again later.",res,next);
 							return;
 						}
 					});
 					
 				};
-				console.dir(h.options.mediatypes.stored['text/plain']);
-
 				
 				if(stored){
 					if(!(data.mimeType in h.options.mediatypes.stored)){
@@ -299,8 +296,6 @@ module.exports = function(h) {
 					return next();
 				}
 				else{
-					console.dir(cursor);
-					
 					var uri = h.util.uri.documentListPage(cursor); 
 					res.send(303, {
 						link :  h.util.link(uri)
@@ -323,8 +318,6 @@ module.exports = function(h) {
 					return next();
 				}
 				else{
-					console.dir(cursor);
-					
 					var uri = h.util.uri.documentListPage(cursor); 
 					res.send(303, {
 						link :  h.util.link(uri)
@@ -372,7 +365,6 @@ module.exports = function(h) {
 							var related = [];
 							["next", "previous"].forEach(function(e){
 								if(result[e]){
-									console.dir( result[e]);
 									related.push({
 										"link" : h.util.link(pageLink(result[e].key), e)
 									});
@@ -412,8 +404,6 @@ module.exports = function(h) {
 					return next();
 				}
 				else{
-					console.dir(cursor);
-					
 					var uri = h.util.uri.userDocumentPage(req.uriParams.userId,cursor); 
 					res.send(303, {
 						link :  h.util.link(uri)
@@ -461,7 +451,6 @@ module.exports = function(h) {
 							var related = [];
 							["next", "previous"].forEach(function(e){
 								if(result[e]){
-									console.dir( result[e]);
 									related.push({
 										"link" : h.util.link(pageLink(req.uriParams.userId,result[e].key), e)
 									});
@@ -497,7 +486,6 @@ module.exports = function(h) {
 					h.responses.error(404,"Document not found.",res,next);
 				}
 				else{
-					console.dir(result);
 					res.send(200, h.util.renderer.documentMeta(result[req.uriParams.documentId]));
 					return next();
 				}
@@ -635,7 +623,6 @@ module.exports = function(h) {
 						});
 						//append results
 				    	list.forEach(function(docId){
-					    	console.log(docId);
 					    	if(!fetchResult[docId]  || !fetchResult[docId]["document"] || !fetchResult[docId]["document"][docId]){
 						    	//misses
 					    		results[h.util.uri.document(docId)] = {
@@ -668,7 +655,6 @@ module.exports = function(h) {
 					h.responses.error(404,"Document not found.",res,next);
 				}
 				else{
-					console.dir(fetchResult);
 					res.send(200, h.util.renderer.documentSnapshot(fetchResult[req.uriParams.documentId]));
 					return next();
 				}
@@ -696,7 +682,6 @@ module.exports = function(h) {
 						});
 						//append results
 						docList.forEach(function(docId){
-							console.log(fetchResult);
 					    	if(!fetchResult[docId]  || !fetchResult[docId]["document"] || !fetchResult[docId]["document"][docId]){
 						    	//misses
 					    		results[h.util.uri.document(docId)] = {
@@ -711,8 +696,6 @@ module.exports = function(h) {
 						    }
 
 						});
-				
-												
 						
 						res.send(200, {
 							results : results

@@ -323,8 +323,6 @@ module.exports = function(h) {
 			
 			var resId = buildResourceId(req);
 			
-			console.dir(resId);
-			
 			h.util.dbFetcher.exist(resId.id, resId.type, function(code){
 				if(code === 404){
 					h.responses.error(404, "Votable resourcex not found ", res, next);

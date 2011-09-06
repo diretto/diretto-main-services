@@ -1,16 +1,8 @@
 require("rfc3339date");
 
 module.exports = function(h) {
-
-	
-	var renderTime = function(doc){
-		return {
-			
-		};
-	};
 	
 	return {
-
 		
 		create : function(req, res, next) {
 			var dateRange = req.uriParams.time;
@@ -42,8 +34,6 @@ module.exports = function(h) {
 					before : before,
 					after : after,
 			};
-			
-			console.log(timeDoc._id);
 			
 			// doc exists
 			h.util.dbFetcher.exist(documentId, h.c.DOCUMENT, function(code){

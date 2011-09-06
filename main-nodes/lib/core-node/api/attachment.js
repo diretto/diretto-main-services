@@ -5,7 +5,6 @@ module.exports = function(h) {
 		create : function(req, res, next) {
 
 			h.util.commonValidator.validateAttachmentData(req.params, res, next, function(data) {
-				console.dir(data);
 
 				var stored = true;
 				if (data.external) {
@@ -128,7 +127,6 @@ module.exports = function(h) {
 						}
 					}
 					else {
-						console.dir(code);
 						h.responses.error(500, "Internal server error. Please try again later.", res, next);
 						return;
 					}
@@ -166,8 +164,6 @@ module.exports = function(h) {
 					var path = "/" + documentId + "/" + attachmentId + "." + h.options.mediatypes.stored[doc.mimeType].extension;
 
 					h.signer.signResponse(201, req.authenticatedUser, path, function(err, expectedToken) {
-						console.log(token);
-						console.log(expectedToken);
 						if (err) {
 							h.responses.error(500, "Internal server error. Please try again later.", res, next);
 							return;

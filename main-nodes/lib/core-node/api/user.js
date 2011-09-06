@@ -152,7 +152,6 @@ module.exports = function(h) {
 					h.responses.error(409,"User already exists.",res,next);
 				}
 				else {
-					console.dir(code);
 					h.responses.error(500,"Internal server error. Please try again later.",res,next);
 				}
 			});

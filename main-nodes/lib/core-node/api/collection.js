@@ -362,7 +362,6 @@ module.exports = function(h) {
 									return;
 								}
 								else{
-									console.log("bla");
 									h.db.remove(doc._id, doc._rev, function(err) {
 										if (err) {
 											h.responses.error(500, "Internal server error.", res, next);
@@ -410,7 +409,6 @@ module.exports = function(h) {
 								return next();
 							}
 							else{
-								console.dir(cursor);
 								
 								var uri = h.util.uri.collectionPageCursor(req.uriParams.userId, req.uriParams.collectionId, cursor); 
 								res.send(303, {
@@ -466,7 +464,6 @@ module.exports = function(h) {
 									else{
 										
 										var list = result.list.map(function(d){
-											console.dir(doc);
 											return {
 												document: {
 													link : h.util.link(h.util.uri.document(d.key))
@@ -477,7 +474,6 @@ module.exports = function(h) {
 										var related = [];
 										["next", "previous"].forEach(function(e){
 											if(result[e]){
-												console.dir( result[e]);
 												related.push({
 													"link" : h.util.link(pageLink(req.uriParams.userId, doc.collectionId, result[e].key), e)
 												});

@@ -38,7 +38,6 @@ module.exports = function(h) {
 		// Check main attributes
 		if (!data || !data.value) {
 			fail("Attributes are missing.");
-			console.log(data);
 			return;
 		}
 
@@ -262,7 +261,6 @@ module.exports = function(h) {
 					var related = [];
 					["next", "previous"].forEach(function(e){
 						if(result[e]){
-							console.dir( result[e]);
 							related.push({
 								"link" : h.util.link(pageLink(result[e].key), e)
 							});
@@ -410,8 +408,6 @@ module.exports = function(h) {
 												value : baseTagDoc.value
 											};
 											
-										console.log(tagDoc);
-										
 											h.db.save(tagDoc._id, tagDoc, function(err, dbRes) {
 
 												if (err) {
@@ -497,7 +493,6 @@ module.exports = function(h) {
 					var related = [];
 					["next", "previous"].forEach(function(e){
 						if(result[e]){
-							console.dir( result[e]);
 							related.push({
 								"link" : h.util.link(pageLink(result[e].key), e)
 							});
@@ -567,7 +562,6 @@ module.exports = function(h) {
 					var related = [];
 					["next", "previous"].forEach(function(e){
 						if(result[e]){
-							console.dir( result[e]);
 							related.push({
 								"link" : h.util.link(pageLink(result[e].key), e)
 							});

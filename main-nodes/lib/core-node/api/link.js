@@ -173,8 +173,6 @@ module.exports = function(h) {
 					return next();
 				}
 				else{
-					console.dir(cursor);
-					
 					var uri = h.util.uri.linkListPage(cursor); 
 					res.send(303, {
 						link :  h.util.link(uri)
@@ -232,7 +230,6 @@ module.exports = function(h) {
 							var related = [];
 							["next", "previous"].forEach(function(e){
 								if(result[e]){
-									console.dir( result[e]);
 									related.push({
 										"link" : h.util.link(pageLink(result[e].key), e)
 									});
@@ -316,11 +313,9 @@ module.exports = function(h) {
 						else{
 							
 							inLinks.forEach(function(id){
-								console.log(h.util.renderer.link(fetchResult[id]));
 								responseData.documentLinks["in"].push(h.util.renderer.link(fetchResult[id]));
 							});
 							outLinks.forEach(function(id){
-								console.log(h.util.renderer.link(fetchResult[id]));
 								responseData.documentLinks["out"].push(h.util.renderer.link(fetchResult[id]));
 							});
 							res.send(200, responseData);

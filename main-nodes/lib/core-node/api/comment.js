@@ -3,7 +3,7 @@ require("rfc3339date");
 module.exports = function(h) {
 	
 	var BATCH_LIMIT = h.options.core.parameters.batchLimit || 50;
-	var PAGINATION_SIZE = 2; //h.options.core.parameters.paginationSize || 20;
+	var PAGINATION_SIZE = h.options.core.parameters.paginationSize || 20;
 
 
 	var COMMENT_MIN_LENGTH = 3;
@@ -118,8 +118,6 @@ module.exports = function(h) {
 					return next();
 				}
 				else{
-					console.dir(cursor);
-					
 					var uri = h.util.uri.documentCommentPage(req.uriParams.documentId, cursor); 
 					res.send(303, {
 						link :  h.util.link(uri)
@@ -161,7 +159,6 @@ module.exports = function(h) {
 							var related = [];
 							["next", "previous"].forEach(function(e){
 								if(result[e]){
-									console.dir( result[e]);
 									related.push({
 										"link" : h.util.link(pageLink(req.uriParams.documentId, result[e].key), e)
 									});
@@ -185,8 +182,6 @@ module.exports = function(h) {
 										return h.util.renderer.comment(fetchResult[req.uriParams.documentId]["comment"][row.key]);
 									});
 									
-									console.dir(result);
-									//res.send(200, h.util.renderer.comment(result[req.uriParams.documentId]["comment"][req.uriParams.commentId]));
 									res.send(200,{
 										"page" : {
 											"link" : h.util.link(pageLink(req.uriParams.documentId, req.uriParams.cursorId))
@@ -215,8 +210,6 @@ module.exports = function(h) {
 					return next();
 				}
 				else{
-					console.dir(cursor);
-					
 					var uri = h.util.uri.userCommentPage(req.uriParams.userId, cursor); 
 					res.send(303, {
 						link :  h.util.link(uri)
@@ -254,7 +247,6 @@ module.exports = function(h) {
 							var related = [];
 							["next", "previous"].forEach(function(e){
 								if(result[e]){
-									console.dir( result[e]);
 									related.push({
 										"link" : h.util.link(pageLink(req.uriParams.userId, result[e].key), e)
 									});
@@ -265,9 +257,7 @@ module.exports = function(h) {
 							if(result.etag){
 								headers["Etag"] = '"'+result.etag+'"';
 							}
-							console.dir(list);
 							h.util.dbFetcher.fetchDocumentResourcesByKey(list,function(err, fetchResult){
-								console.dir(fetchResult);
 								if(err){
 									h.responses.error(500,"Internal server error.",res,next);
 								}
@@ -279,8 +269,6 @@ module.exports = function(h) {
 										return h.util.renderer.comment(fetchResult[row.documentId]["comment"][row.key]);
 									});
 									
-									console.dir(result);
-									//res.send(200, h.util.renderer.comment(result[req.uriParams.documentId]["comment"][req.uriParams.commentId]));
 									res.send(200,{
 										"page" : {
 											"link" : h.util.link(pageLink(req.uriParams.userId, req.uriParams.cursorId))
