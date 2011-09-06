@@ -1,3 +1,22 @@
 {
-
+	"bind" : {
+		"ip" : "0.0.0.0", 
+		"port" : "8002"
+	},
+	"parameters" : {
+		"paginationSize" : 20
+	},
+	"persistence" : {
+		"couchdb":{
+			"host" : "localhost",
+			"port" : 5984,
+			"table" : "diretto_main"			
+		}
+	},
+	"allowNewUsers" : true,
+    "deployment": {
+    	"title":"diretto v2 Feed Dev Instance",
+    	"website":"http://www.diretto.org",
+    	"contact":"mail@diretto.org"
+    }
 }

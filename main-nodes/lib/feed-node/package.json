@@ -1,0 +1,12 @@
+{
+  "name"          : "feed-node",
+  "description"   : "A node.js/CouchDB based diretto Feed API service implementation",
+  "url"           : "http://www.diretto.org",
+  "keywords"      : ["diretto"],
+  "author"        : "Benjamin Erb",
+  "contributors"  : [],
+  "dependencies"  : [],
+  "lib"           : ".",
+  "main"          : "./feed-node.js",
+  "version"       : "0.1.0"
+}
