@@ -22,3 +22,8 @@ config['mediatypes'] = direttoUtil.readConfigFileSync(path.join(__dirname, 'conf
 
 var coreNode = CoreNode(config);
 coreNode.bind();
+
+//BAD THING, I know :-(
+process.on('uncaughtException', function (err) {
+	  console.log('ERROR: ' + err);
+});

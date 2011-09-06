@@ -22,3 +22,8 @@ console.dir(config);
 
 var storageNode = StorageNode(config);
 storageNode.bind();
+
+//BAD THING, I know :-(
+process.on('uncaughtException', function (err) {
+	  console.log('ERROR: ' + err);
+});
