@@ -36,8 +36,6 @@ module.exports = function(h) {
 					var link = null;
 					if(item.external.link && item.external.link.href && (typeof item.external.link.href === "string")){
 						link = h.util.link(item.external.link.href);
-						
-						console.dir(link);
 					}
 					valid.push({
 						external : {
@@ -45,9 +43,6 @@ module.exports = function(h) {
 							link : link
 						}
 					});
-				}
-				else{
-					console.log("x "+item.external);
 				}
 			}
 			else if(item.user){
