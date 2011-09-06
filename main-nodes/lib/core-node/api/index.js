@@ -32,16 +32,40 @@ module.exports = function(h) {
 				"href" : "http://diretto.github.com/diretto-api-doc/v2/diretto/core.html"
 			}
 		},{
+			"title" : "Documents Collection Resource",
+			"link" : {
+				"rel" : "self",
+				"href" : h.util.uri.documents()
+			}
+		},{
+			"title" : "Links Collection Resource",
+			"link" : {
+				"rel" : "self",
+				"href" : h.util.uri.links()
+			}
+		},{
+			"title" : "Tags Collection Resource",
+			"link" : {
+				"rel" : "self",
+				"href" : h.util.uri.basetags()
+			}
+		},{
+			"title" : "User Collection Resource",
+			"link" : {
+				"rel" : "self",
+				"href" : h.util.uri.users()
+			}
+		},{
+			"title" : "Query Resource",
+			"link" : {
+				"rel" : "self",
+				"href" : h.util.uri.queryDispatch()
+			}
+		},{
 			"title" : "Service Registry",
 			"link" : {
 				"rel" : "self",
 				"href" : h.util.uri.serviceRegistry()
-			}
-		},{
-			"title" : "User Factory Resource",
-			"link" : {
-				"rel" : "self",
-				"href" : h.util.uri.users()
 			}
 		}],
 		"parameters" : {
