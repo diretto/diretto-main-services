@@ -74,7 +74,7 @@ exports.Plugin = {
 				}
 				else {
 					var that = this;
-					that.pool.dispatchRequest("GET", path.join("/", that.db, userid), {}, function(request) {
+					that.pool.dispatchRequest("GET", path.join("/", that.db, "u-"+userid), {}, function(request) {
 						request.end();
 						request.once('response', function(response) {
 							if (response.statusCode === 200) {
