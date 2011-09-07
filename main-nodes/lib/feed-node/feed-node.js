@@ -5,6 +5,8 @@ var restify = require('node-restify');
 var log = restify.log;
 var cradle = require('cradle');
 
+var mustache = require('mustache');
+
 log.level(restify.LogLevel.Debug);
 
 var Signer = require('signer');
@@ -22,9 +24,10 @@ module.exports = function(options) {
 	
 	// Create restify server
 	var server = restify.createServer({
-		serverName : options.server.signature
+		serverName : options.server.signature,
+		accept : ["application/json","application/xml","application/atom+xml"]
 	});
-
+	
 	var db = new (cradle.Connection)(options.feed.persistence.couchdb.host, options.feed.persistence.couchdb.port, {
 		cache : false,
 		raw : false,
@@ -38,9 +41,12 @@ module.exports = function(options) {
 		c : require('../core-node/util/constants.js'),
  
 		options : options,
+		
+		mustache : mustache,
 
 		util : {
-			uri : require('../core-node/util/core-uri-builder.js')(options.common.endpoints.core),
+			uri : require('./util/feed-uri-builder.js')(options.common.endpoints.feed),
+			coreUri : require('../core-node/util/core-uri-builder.js')(options.common.endpoints.core),
 			uriParser : require('../core-node/util/core-uri-parser.js')(options.common.endpoints.core),
 			link : function(href, rel) {
 				return {
@@ -48,7 +54,7 @@ module.exports = function(options) {
 					rel : rel || "self"
 				}
 			},
-			dbPaginator : require('../core-node/util/db-paginator.js')(db),
+			feedPaginator : require('./util/feed-paginator.js')(db),
 			
 			empty : direttoUtil.empty,
 			
@@ -95,7 +101,7 @@ module.exports = function(options) {
 	apiHelper['util']['dbHelper'] = require('../core-node/util/db-helper.js')(apiHelper); 
 	apiHelper['util']['dbFetcher'] = require('../core-node/util/db-fetcher.js')(apiHelper); 
 	apiHelper['util']['commonValidator'] = require('../core-node/util/common-validator.js')(apiHelper); 
-	apiHelper['util']['renderer'] = require('../core-node/util/resource-renderer.js')(apiHelper); 
+	apiHelper['util']['renderer'] = require('./util/feed-renderer.js')(apiHelper); 
 	
 	var api = {
 
@@ -127,19 +133,22 @@ module.exports = function(options) {
 
 	//Atom Feeds
 	server.get('/v2/feed/documents', [  ], api.atomfeed.getDocumentsFeed, [ logging ]);
+	server.get('/v2/feed/documents/cursor/:cursorId', [  ], api.atomfeed.getDocumentsFeed, [ logging ]);
 	server.get('/v2/feed/attachments', [  ], api.atomfeed.getAttachmentsFeed, [ logging ]);
+	server.get('/v2/feed/attachments/cursor/:cursorId', [  ], api.atomfeed.getAttachmentsFeed, [ logging ]);
 	server.get('/v2/feed/comments', [  ], api.atomfeed.getCommentsFeed, [ logging ]);
+	server.get('/v2/feed/comments/cursor/:cursorId', [  ], api.atomfeed.getCommentsFeed, [ logging ]);
 	server.get('/v2/feed/media/:mediaType', [  ], api.atomfeed.getMediaFeed, [ logging ]);
+	server.get('/v2/feed/media/:mediaType/cursor/:cursorId', [  ], api.atomfeed.getMediaFeed, [ logging ]);
 	server.get('/v2/feed/document/:documentId', [  ], api.atomfeed.getDocumentDetailsFeed, [ logging ]);
 
 	//Geo Feeds
-	server.get('/v2/feed/geo/area', [  ], api.geoofeed.getByBbox, [ logging ]);
-	server.get('/v2/feed/geo/documents', [  ], api.geoofeed.getDocuments, [ logging ]);
-	server.get('/v2/feed/geo/document/:documentId/positions', [  ], api.geoofeed.getDocumentPositions, [ logging ]);
+	server.get('/v2/feed/geo/area', [  ], api.geofeed.getByBbox, [ logging ]);
+	server.get('/v2/feed/geo/documents', [  ], api.geofeed.getDocuments, [ logging ]);
+	server.get('/v2/feed/geo/document/:documentId/positions', [  ], api.geofeed.getDocumentPositions, [ logging ]);
 	
 	// Index
 	server.get('/v2', [], api.index.get, [ logging ]);
-
 	
 	
 	return {

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <generator uri="http://www.diretto.org" version="{{serverVersion}}">{{serverName}}</generator>
+    <link rel="self" href="{{selfUri}}" />
+    <link rel="alternate" href="{{deploymentUri}}" />
+    {{#hasNext}}<link rel="next" href="{{nextUri}}" />{{/hasNext}}
+    {{#hasPrevious}}<link rel="previous" href="{{previousUri}}" />{{/hasPrevious}}
+    <link rel="hub" href="{{hub}}" />
+    <title>{{title}} – List of recently published comments</title>
+    <id>{{feedUri}}</id>
+    <updated>{{updated}}</updated>
+     
+     {{#entries}}
+     <entry>
+        <id>{{commentUri}}</id>
+        <title>Comment {{documentId}}/{{commentId}}</title>
+        <updated>{{creationTime}}</updated>
+        <category term="comment" />
+        <author>
+            <uri>{{userUri}}</uri>
+        </author>
+        <content><![CDATA[{{content}}]]></content>
+        <link title="comment resource" rel="alternate" href="{{commentUri}}"/>
+        <link title="corresponding document resource" rel="related" href="{{documentUri}}"/>
+     </entry>  
+
+     {{/entries}}
+      
+  
+</feed>
