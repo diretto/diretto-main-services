@@ -25,6 +25,43 @@ module.exports = function(h) {
 				}
 			}
 		},
+		"links" : [ {
+			"title" : "diretto Feed API Documentation",
+			"link" : {
+				"rel" : "self",
+				"href" : "http://diretto.github.com/diretto-api-doc/v2/diretto/feed.html"
+			}
+		},{
+			"title" : "Atom feed of published documents",
+			"link" : {
+				"rel" : "self",
+				"href" : h.util.uri.documentsFeed()
+			}
+		},{
+			"title" : "Atom feed of published comments",
+			"link" : {
+				"rel" : "self",
+				"href" : h.util.uri.commentsFeed()
+			}
+		},{
+			"title" : "Atom feed of published attachments",
+			"link" : {
+				"rel" : "self",
+				"href" : h.util.uri.attachmentsFeed()
+			}
+		},{
+			"title" : "Atom feed of published documents of a distinct media type",
+			"link" : {
+				"rel" : "self",
+				"href" : h.util.uri.mediaFeed("{type}")
+			}
+		},{
+			"title" : "Atom feed of resources related to a distinct document",
+			"link" : {
+				"rel" : "self",
+				"href" : h.util.uri.documentDetailsFeed("{id}")
+			}
+		}],
 		"parameters" : {
 			"paginationSize" : h.options.feed.parameters.paginationSize || 20,
 		}
