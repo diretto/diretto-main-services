@@ -50,6 +50,43 @@ module.exports = function(h) {
 		});
 	};
 	
+	var fetchViewDoc = function(key, viewName, callback){
+		h.db.view(viewName, {
+			limit : 1,
+			key : key,
+			include_docs : true
+		}, function(err, dbRes) {
+			if (dbRes && dbRes.length === 1) {
+				callback(null, dbRes[0].doc);
+			}
+			else if (dbRes) {
+				callback(404);
+			}
+			else {
+				callback(500);
+			}
+		});
+	};
+	
+	
+	var fetchLatestViewRow = function(include, descending, viewName, callback){
+		h.db.view(viewName, {
+			limit : 1,
+			include_docs : !!include,
+			descending : !!descending
+		}, function(err, dbRes) {
+			if (dbRes && dbRes.length === 1) {
+				callback(null, dbRes[0]);
+			}
+			else if (dbRes) {
+				callback(404);
+			}
+			else {
+				callback(500);
+			}
+		});
+	};
+	
 	var exist = function(id, type, callback){
 		h.db.head(type.wrap(id), function(err, headers,code) {
 			if(code && code === 404){
@@ -350,6 +387,9 @@ module.exports = function(h) {
 		fetch : fetch,
 		exist : exist,
 		
+		fetchViewDoc : fetchViewDoc,
+		fetchLatestViewRow : fetchLatestViewRow,
+		
 		viewKeyExists : viewKeyExists,
 		
 		fetchVotes : fetchVotes,
@@ -362,6 +402,7 @@ module.exports = function(h) {
 		
 		fetchMultipleDocsById : fetchMultipleDocsById,
 		fetchMultipleLinksById : fetchMultipleLinksById,
-		fetchMultipleDocSnapshotsById : fetchMultipleDocSnapshotsById
+		fetchMultipleDocSnapshotsById : fetchMultipleDocSnapshotsById,
+		
 	};
 };
