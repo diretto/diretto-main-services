@@ -18,7 +18,10 @@ module.exports = function(services, callback) {
 		},
 		"org.diretto.api.main.storage" : {
 			"v2" : true
-		}
+		},
+		"org.diretto.api.main.feed" : {
+			"v2" : true
+		},
 	};
 
 	var validatedURIs = [];
