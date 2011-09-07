@@ -104,9 +104,9 @@ http.ServerResponse.prototype.send = function(options) {
   this._bytes = 0;
   if (data) {
     data = data + '\n';
-    this._bytes = data.length;
+    this._bytes = Buffer.byteLength(data, 'utf8');
     if (_opts.code !== HttpCodes.NoContent) {
-      headers['Content-Length'] = data.length;
+      headers['Content-Length'] = Buffer.byteLength(data, 'utf8');
       if (!_opts.noContentMD5) {
 //        var hash = crypto.createHash('md5');
 //        hash.update(data);
@@ -134,6 +134,107 @@ http.ServerResponse.prototype.send = function(options) {
     this.end();
   }
 };
+
+http.ServerResponse.prototype.sendArbitrary = function(options) {
+	  var _opts = {};
+	  var data;
+	  var now = new Date();
+
+	  if (!options) throw new TypeError('options required');
+	  if (typeof(options) === 'object') {
+	    _opts = options;
+	    if (!_opts.code || typeof(_opts.code) !== 'number') {
+	      throw new TypeError('options.code must be a number');
+	    }
+	  } else if (typeof(options) === 'number' || typeof(options) === 'string') {
+	    // support legacy api
+	    _opts.code = parseInt(arguments[0], 10);
+	    _opts.body = arguments[1];
+	    _opts.headers = arguments[2];
+	  } else {
+	    throw new TypeError('invalid argument type: ' + typeof(options));
+	  }
+
+	  this._code = _opts.code;
+	  this._time = now.getTime() - this.startTime;
+
+	  var headers;
+	  if (!_opts.headers) {
+	    headers = {};
+	  } else {
+	    headers = _opts.headers;
+	  }
+
+	  // These headers allow strict clients (i.e. Google Chrome) to know that
+	  // this server does allow itself to be invoked from pages that aren't
+	  // part of the same origin policy.
+	  headers['Access-Control-Allow-Origin'] = '*';
+	  headers['Access-Control-Allow-Methods'] = this._allowedMethods.join(', ');
+
+	  if (!headers['Access-Control-Allow-Methods'])
+	    delete headers['Access-Control-Allow-Methods'];
+
+	  if (!_opts.noClose)
+	    headers.Connection = 'close';
+
+	  if (this._apiVersion &&
+	      this._serverVersioned &&
+	      this._apiVersion !== Constants.NoApiVersion)
+	    headers[Constants.XApiVersion] = this._apiVersion;
+
+	  headers.Date = utils.newHttpDate(now);
+	  headers.Server = this._config.serverName;
+	  headers[Constants.XRequestId] = this.requestId;
+	  headers[Constants.XResponseTime] = this._time;
+
+	  if (_opts.body && _opts.code !== HttpCodes.NoContent) {
+		  data = _opts.body;
+//	    headers['Content-Type'] = this._accept;
+//	    switch (this._accept) {
+//	    case Constants.ContentTypeJson:
+//	      data = JSON.stringify(_opts.body);
+//	      break;
+//	    case Constants.ContentTypeXml:
+//	      throw new Error('XML not yet supported');
+//	    default:
+//	      throw new Error('Somehow response.send has an unknown accept type: ' +
+//	                      this._accept);
+//	    }
+	  }
+
+	  this._bytes = 0;
+	  if (data) {
+//	    data = data + '\n';
+	    this._bytes = Buffer.byteLength(data, 'utf8');
+	    if (_opts.code !== HttpCodes.NoContent) {
+	      headers['Content-Length'] = Buffer.byteLength(data, 'utf8');
+	      if (!_opts.noContentMD5) {
+//	        var hash = crypto.createHash('md5');
+//	        hash.update(data);
+//	        headers['Content-MD5'] = hash.digest(encoding = 'base64');
+	      }
+	    } else {
+	      headers['Content-Length'] = 0;
+	    }
+	  } else {
+	    if (!_opts.noEnd) {
+	      headers['Content-Length'] = 0;
+	    }
+	  }
+
+	  if (log.trace()) {
+	    log.trace('response.send: code=%d, headers=%o, body=%s',
+	              _opts.code, headers, data);
+	  }
+
+	  this.writeHead(_opts.code, headers);
+	  if (!_opts.noEnd) {
+	    if (_opts.code !== HttpCodes.NoContent && data) {
+	      this.write(data);
+	    }
+	    this.end();
+	  }
+	};
 
 
 http.ServerResponse.prototype.sendError = function sendError(error) {
