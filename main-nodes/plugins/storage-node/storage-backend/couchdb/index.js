@@ -153,9 +153,13 @@ exports.Plugin = {
 									emitter.emit("error");
 									// TODO: catch and retry with newer
 									// revision
+									console.dir(uploadResponse);
+									console.dir(uploadResponse.statusCode);
 								}
 								else {
 									emitter.emit("error");
+									console.dir(uploadResponse);
+									console.dir(uploadResponse.statusCode);
 								}
 							});
 						});
