@@ -145,6 +145,7 @@ module.exports = function(h) {
 						creator : req.authenticatedUser,
 						creationTime : new Date().toRFC3339UTCString(),
 						title : data.title,
+						description: data.description,
 						tags : [],
 						time : {
 							id : h.c.TIME.wrap(h.util.dbHelper.concat(docId, h.util.dbHelper.createTimeId(data.createdBetween.before, data.createdBetween.after))),
