@@ -144,6 +144,7 @@ module.exports = function(h) {
 						mediaType : data.mimeType.split("/")[0],
 						creator : req.authenticatedUser,
 						creationTime : new Date().toRFC3339UTCString(),
+						title : data.title,
 						tags : [],
 						time : {
 							id : h.c.TIME.wrap(h.util.dbHelper.concat(docId, h.util.dbHelper.createTimeId(data.createdBetween.before, data.createdBetween.after))),
