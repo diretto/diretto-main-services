@@ -12,7 +12,7 @@ module.exports = function(h) {
 			h.responses.error(400, "Invalid key/value. " + (msg || "Please check your entity structure."), response, next);
 		};
 
-		if (!data || !data.value) {
+		if (data  === undefined || data.value === undefined ) {
 			fail("Attributes are missing.");
 			return;
 		}

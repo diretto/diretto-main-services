@@ -20,7 +20,7 @@ module.exports = function(h) {
 			h.responses.error(400, "Invalid collection values. " + (msg || "Please check your entity structure."), response, next);
 		};
 
-		if (!data || !data.title || !data.description) {
+		if (data  === undefined || data.title  === undefined || data.description === undefined ) {
 			fail("Attributes are missing.");
 			return;
 		}

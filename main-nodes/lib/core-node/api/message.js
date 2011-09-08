@@ -42,7 +42,7 @@ module.exports = function(h) {
 			h.responses.error(400,"Invalid message. " + (msg || "Please check your entity structure."),response,next);
 		};		
 		
-		if (!data || !data.title|| !data.content || !(typeof (data.title) == 'string') || !(typeof (data.content) == 'string')) {
+		if (data  === undefined || data.title === undefined || data.content  === undefined || !(typeof (data.title) == 'string') || !(typeof (data.content) == 'string')) {
 			fail("Attributes are missing.");
 			return;
 		}

@@ -14,17 +14,17 @@ module.exports = function(h) {
 			h.responses.error(400,"Invalid query request. " + (msg || "Please check your entity structure."),response,next);
 		};		
 		
-		if (!data || !data.query) {
+		if (data  === undefined || data.query === undefined ) {
 			fail("Empty query.");
 			return;
 		}
 		
-		if(!data.query.time || !data.query.time.start || !data.query.time.end || (typeof data.query.time.start !== "string") || (typeof data.query.time.end !== "string") || !h.util.commonValidator.validateDate(data.query.time.start)  || !h.util.commonValidator.validateDate(data.query.time.end) ){
+		if(data.query.time  === undefined || data.query.time.start  === undefined || data.query.time.end  === undefined || (typeof data.query.time.start !== "string") || (typeof data.query.time.end !== "string") || !h.util.commonValidator.validateDate(data.query.time.start)  || !h.util.commonValidator.validateDate(data.query.time.end) ){
 			fail("Invalid time.");
 			return;
 		}
 		
-		if(!data.query.location || !data.query.location.bbox || !data.query.location.bbox.length || data.query.location.bbox.length !== 4){
+		if(data.query.location  === undefined || data.query.location.bbox  === undefined || data.query.location.bbox.length  === undefined || data.query.location.bbox.length !== 4){
 			fail("Invalid location.");
 			return;
 		}

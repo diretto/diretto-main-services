@@ -23,7 +23,7 @@ module.exports = function(h) {
 			h.responses.error(400, "Invalid link values. " + (msg || "Please check your entity structure."), response, next);
 		};
 
-		if (!data || !data.title || !data.description || !data.source || !data.destination) {
+		if (data  === undefined || data.title  === undefined || data.description  === undefined || data.source  === undefined || data.destination === undefined ) {
 			fail("Attributes are missing.");
 			return;
 		}

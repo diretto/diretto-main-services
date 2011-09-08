@@ -24,7 +24,7 @@ module.exports = function(h) {
 		};
 
 		// Check main attributes
-		if (!data || !data.content) {
+		if (data  === undefined || data.content === undefined ) {
 			fail("Attributes are missing.");
 			return;
 		}

@@ -18,7 +18,7 @@ module.exports = function(h) {
 			h.responses.error(400,"Invalid user account values. " + (msg || "Please check your entity structure."),response,next);
 		};		
 		
-		if (!data || !data.email|| !data.password|| !data.username) {
+		if (data  === undefined || data.email === undefined || data.password === undefined || data.username === undefined ) {
 			fail("Attributes are missing.");
 			return;
 		}
@@ -46,7 +46,7 @@ module.exports = function(h) {
 			h.responses.error(400,"Invalid batch request. " + (msg || "Please check your entity structure."),response,next);
 		};		
 		
-		if (!data || !data.users || !data.users.length || data.users.length < 1) {
+		if (data  === undefined || data.users  === undefined || data.users.length  === undefined || data.users.length < 1) {
 			fail("No users list.");
 			return;
 		}

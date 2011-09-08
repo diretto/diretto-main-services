@@ -127,7 +127,7 @@ module.exports = function(h) {
 		};
 		
 		validateAttachmentData(docData, response,next, function(validatedData){
-			if(!docData.location || !validateLocation(docData.location)){
+			if(docData.location  === undefined || !validateLocation(docData.location)){
 				fail("Invalid location");
 				return;
 			}
@@ -135,7 +135,7 @@ module.exports = function(h) {
 				validatedData['location'] = docData.location;
 			}
 			
-			if(!docData.createdBetween || !docData.createdBetween.before || !docData.createdBetween.after){
+			if(docData.createdBetween === undefined || docData.createdBetween.before === undefined  || docData.createdBetween.after === undefined ){
 				fail("Invalid creation time range");
 				return;
 			}
@@ -162,7 +162,8 @@ module.exports = function(h) {
 			h.responses.error(400, "Invalid entity. " + (msg || "Please check your entity structure."), response, next);
 		};
 
-		if (!data || !data.title || !data.description || !data.mimeType || !data.creators || !data.contributors || !data.license) {
+		console.dir(data);
+		if (data === undefined || data.title === undefined || data.description === undefined || data.mimeType === undefined || data.creators === undefined || data.contributors === undefined || data.license === undefined) {
 			fail("Attributes are missing.");
 			return;
 		}

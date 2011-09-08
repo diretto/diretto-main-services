@@ -18,7 +18,7 @@ module.exports = function(h) {
 	// returns null if ok, otherwise error
 	var validateBaseTagGeneric = function(tag) {
 
-		if (!tag || !(typeof (tag) == 'string' && tag.length >= TAG_MIN_LENGTH && tag.length <= TAG_MAX_LENGTH)) {
+		if (tag  === undefined || !(typeof (tag) == 'string' && tag.length >= TAG_MIN_LENGTH && tag.length <= TAG_MAX_LENGTH)) {
 			return {
 				error : {
 					reason : "Invalid tag entity. Please check your entity structure."
@@ -36,7 +36,7 @@ module.exports = function(h) {
 		};
 
 		// Check main attributes
-		if (!data || !data.value) {
+		if (data  === undefined || data.value === undefined ) {
 			fail("Attributes are missing.");
 			return;
 		}
@@ -58,12 +58,12 @@ module.exports = function(h) {
 		};
 
 		// Check main attributes
-		if (!data || !data.baseTag) {
+		if (data  === undefined || data.baseTag === undefined ) {
 			fail("Attributes are missing.");
 			return;
 		}
 		
-		if(!data.baseTag.link || !data.baseTag.link.href || (typeof data.baseTag.link.href !== "string")){
+		if(data.baseTag.link  === undefined || data.baseTag.link.href  === undefined || (typeof data.baseTag.link.href !== "string")){
 			fail("Invalid URI.");
 			return;
 		}

@@ -16,7 +16,7 @@ module.exports = function(h) {
 			h.responses.error(400,"Invalid batch request. " + (msg || "Please check your entity structure."),response,next);
 		};		
 		
-		if (!data || !data.documents || !data.documents.length || data.documents.length < 1) {
+		if (data  === undefined || data.documents  === undefined || data.documents.length  === undefined || data.documents.length < 1) {
 			fail("No documents in list.");
 			return;
 		}
