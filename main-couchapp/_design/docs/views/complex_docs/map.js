@@ -8,7 +8,7 @@ function(doc) {
 	  if (doc.type === "document" && doc.enabled === true) {
 		  emit(["document",doc._id.substr(2),"document",doc._id.substr(2)],null);
 	  }
-	  else if (doc.type === "attachment") {
+	  else if (doc.type === "attachment" && doc.enabled === true) {
 		  emit(["document",doc.documentId,"attachment",doc.attachmentId],null);
 	  }
 	  else if (doc.type === "comment") {
