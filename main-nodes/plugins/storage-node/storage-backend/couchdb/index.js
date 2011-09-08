@@ -87,6 +87,7 @@ exports.Plugin = {
 						}
 					}
 					else {
+						console.dir(response);
 						emitter.emit("error");
 					}
 				});
