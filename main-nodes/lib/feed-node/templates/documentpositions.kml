@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document>
+    <name>{{title}} – Suggested positions for document {{documentId}}</name>
+ 
+ 	{{#entries}}
+    <Placemark>
+        <name>{{lat}},{{lon}},{{variance}}</name>
+        <description>Position Lat: {{lat}}, Lon: {{lon}}, Variance: {{variance}}m; Votes: {{upvotes}} up, {{downvotes}} down</description>
+          <atom:author>
+            <atom:uri>{{userUri}}</atom:uri>        
+          </atom:author>
+          <atom:link rel="alternate" href="{{locationUri}}" />
+ 
+        <Point>
+            <coordinates>{{lon}},{{lat}},0</coordinates>
+        </Point>
+    </Placemark>
+     {{/entries}}
+ 
+ </Document>
+</kml>
