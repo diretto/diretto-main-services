@@ -74,8 +74,12 @@ exports.Plugin = {
 						var metaData = {
 							'Etag' : response.headers['etag'],
 							'Content-Length' : response.headers['content-length'],
-							'Content-Type' : response.headers['content-type']
 						};
+
+						//CouchDB will not give us the content type in case of conditional request hit 
+						if(response.statusCode === 200){
+							metaData['Content-Type'] = response.headers['content-type'];
+						}
 
 						emitter.emit("metadata", metaData, ((etag && response.headers['etag'] && etag === response.headers['etag']) ? 304 : 200));
 						if (!isHeadRequest && response.statusCode !== 304) {

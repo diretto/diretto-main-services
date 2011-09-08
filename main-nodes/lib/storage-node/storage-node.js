@@ -130,8 +130,14 @@ module.exports = function(options) {
 							console.log(metadata);
 
 							direttoUtil.mixin(headers, metadata);
+							
+							// http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.5
+							if(code === 304 && headers['Content-Type']){
+								delete headers['Content-Type'];
+							}
+							
 							response.writeHead(code || 200, headers);
-							if (code && code == 304) {
+							if (code && code === 304) {
 								response.end();
 							}
 						});
