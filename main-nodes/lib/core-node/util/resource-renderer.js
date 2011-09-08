@@ -231,7 +231,7 @@ module.exports = function(h) {
 				      "up":d.votes.up,
 			         "down":d.votes.down
 			      },
-			      "license":"Creative Commons Attribution-ShareAlike 3.0 Unported - Deed",
+			      "license":d.doc.license,
 			      "contributors":[],
 			      "creators":[]
 			   }
