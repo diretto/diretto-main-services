@@ -4,7 +4,8 @@
 		"port" : "8002"
 	},
 	"parameters" : {
-		"paginationSize" : 20
+		"paginationSize" : 20,
+		"maxResults" : 500
 	},
 	"hub" : {
 		"uri" : "http://hub/"
