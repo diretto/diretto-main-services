@@ -60,11 +60,9 @@ module.exports = function(options) {
 			
 		},
 		
-
 		db : db,
 
 		uuid : uuid,
-
 
 		responses : {
 

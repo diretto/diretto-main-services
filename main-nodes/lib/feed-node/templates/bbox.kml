@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document>
+    <name>{{title}} – List of document positions within a given bounding box: {{lat1}},{{lon1}},{{lat2}},{{lon2}},</name>
+ 
+ 	{{#entries}}
+    <Placemark>
+        <name>Document <![CDATA[{{documentId}}]]></name>
+        <description></description>
+          <atom:link rel="alternate" href="{{documentUri}}" />
+ 
+        <Point>
+            <coordinates>{{lon}},{{lat}},0</coordinates>
+        </Point>
+    </Placemark>
+     {{/entries}}
+ 
+    <!-- more entries -->
+ 
+ </Document>
+</kml>

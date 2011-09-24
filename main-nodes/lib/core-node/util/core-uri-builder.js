@@ -134,6 +134,9 @@ module.exports = function(baseUri){
 				userListCursorId: id
 			});
 		},
+		mediatypes : function(){
+			return baseUri+"/service/mediatypes"; 
+		},		
 		users : function(){
 			return baseUri+"/users"; 
 		},		
