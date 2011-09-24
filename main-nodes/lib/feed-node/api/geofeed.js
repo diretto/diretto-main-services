@@ -181,8 +181,6 @@ module.exports = function(h) {
 			
 			validateBbox(req.params, res, next, function(data){
 				
-				console.dir(data);
-				
 				var lat1 = data.lat1;
 				var lat2 = data.lat2;
 				var lon1 = data.lon1;
@@ -216,8 +214,6 @@ module.exports = function(h) {
 						var entries = []; 
 						
 						dbRes.forEach(function(item){
-							
-							console.dir(item);
 							
 							entries.push({
 								documentId : item.id.substr(2),
