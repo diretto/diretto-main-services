@@ -1,0 +1,12 @@
+{
+  "name"          : "event-listener",
+  "description"   : "node.js listener for diretto",
+  "url"           : "http://www.diretto.org",
+  "keywords"      : ["diretto"],
+  "author"        : "Benjamin Erb",
+  "contributors"  : [],
+  "dependencies"  : [],
+  "lib"           : ".",
+  "main"          : "./listener.js",
+  "version"       : "0.1.0"
+}
