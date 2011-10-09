@@ -20,7 +20,8 @@ module.exports = (function() {
 	                [ "document", "d" ],
 	                [ "vote", "v" ],
 	                [ "query", "q" ],
-	                [ "collectiondocument", "p" ]
+	                [ "collectiondocument", "p" ],
+	                [ "event", "e" ]
      ];
 
 	var c = {};

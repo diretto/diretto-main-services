@@ -102,7 +102,7 @@ module.exports = function(h) {
 					var userId = req.authenticatedUser;
 					var documentId = req.uriParams.documentId;
 					
-					var id = h.util.dbHelper.concat(userId, documentId, key);						
+					var id = h.util.dbHelper.concat(documentId, userId, key);						
 					
 					h.util.dbFetcher.fetch(id, h.c.KEYVALUE, function(err, doc) {
 						if (err && err === 404) {
@@ -121,6 +121,13 @@ module.exports = function(h) {
 								}
 								else {
 									res.send(204);
+								
+									h.util.events.keyRemoved({
+										key : key,
+										userId : userId,
+										documentId : documentId
+									});
+									
 									return next();
 								}
 							});
@@ -189,6 +196,13 @@ module.exports = function(h) {
 									}, {
 										'Location' : h.util.uri.keyvalue(documentId, userId, key)
 									});
+									
+									h.util.events.keySet({
+										key : key,
+										userId : userId,
+										documentId : documentId
+									});
+									
 									return next();
 								}
 							});

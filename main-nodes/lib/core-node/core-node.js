@@ -146,7 +146,13 @@ module.exports = function(options) {
 	apiHelper['util']['dbFetcher'] = require('./util/db-fetcher.js')(apiHelper); 
 	apiHelper['util']['commonValidator'] = require('./util/common-validator.js')(apiHelper); 
 	apiHelper['util']['renderer'] = require('./util/resource-renderer.js')(apiHelper); 
+	apiHelper['util']['events'] = require('./util/event-creator.js')(apiHelper); 
 	
+	
+	var dbUri = "http://"+(options.core.persistence.couchdb.host  || "localhost")+":"+(options.core.persistence.couchdb.port  || "5984")+"/"+(options.core.persistence.couchdb.table || "diretto_main");
+	var eventListener = require('../event-listener')(dbUri);
+	
+	var snapshotUpdater = require("./util/snapshot-updater.js")(apiHelper, eventListener.get()); 
 
 	// Return binding by invoking the actual handlers, passing the helper object
 	var api = {

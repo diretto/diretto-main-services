@@ -278,6 +278,20 @@ module.exports = function(h) {
 								}, {
 									'Location' : h.util.uri.document(docId)
 								});
+								
+								h.util.events.documentCreated({
+									userId : req.authenticatedUser,
+									documentId : docId,
+									mediaType : data.mimeType.split("/")[0]
+								});
+								
+								h.util.events.attachmentCreated({
+									userId : req.authenticatedUser,
+									documentId : docId,
+									attachmentId : docId,
+									mimeType : data.mimeType
+								});
+								
 								return next();
 							});
 						}

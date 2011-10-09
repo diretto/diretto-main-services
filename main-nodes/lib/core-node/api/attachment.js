@@ -182,6 +182,19 @@ module.exports = function(h) {
 								}
 								else {
 									res.send(204);
+									
+									h.util.events.documentCreated({
+										userId : req.authenticatedUser,
+										documentId : documentId,
+										mediaType : doc.mimeType.split("/")[0]
+									});
+									h.util.events.attachmentCreated({
+										userId : req.authenticatedUser,
+										documentId : documentId,
+										attachemntId : attachmentId,
+										mimeType : doc.mimeType
+									});									
+									
 									return next();
 								}
 							});

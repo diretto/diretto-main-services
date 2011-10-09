@@ -87,6 +87,13 @@ module.exports = function(h) {
 								}, {
 									'Location' : h.util.uri.comment(documentId,commentId)
 								});
+								
+								h.util.events.commentCreated({
+									commentId : commentId,
+									userId : req.authenticatedUser,
+									documentId : documentId
+								});
+								
 								return next();
 							}
 						});
