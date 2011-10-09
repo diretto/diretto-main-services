@@ -101,6 +101,11 @@ module.exports = function(options) {
 	apiHelper['util']['commonValidator'] = require('../core-node/util/common-validator.js')(apiHelper); 
 	apiHelper['util']['renderer'] = require('./util/feed-renderer.js')(apiHelper); 
 	
+	var dbUri = "http://"+(options.feed.persistence.couchdb.host  || "localhost")+":"+(options.feed.persistence.couchdb.port  || "5984")+"/"+(options.feed.persistence.couchdb.table || "diretto_main");
+	var eventListener = require('../event-listener')(dbUri);
+	
+	var pushPing = require("./util/push-ping.js")(apiHelper, eventListener.get()); 
+	
 	var api = {
 
 			index : require('./api/index.js')(apiHelper),
