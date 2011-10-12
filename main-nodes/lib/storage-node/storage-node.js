@@ -154,6 +154,9 @@ module.exports = function(options) {
 							if(code === 304 && headers['Content-Type']){
 								delete headers['Content-Type'];
 							}
+							if(code === 304 && headers['Content-Length']){
+								delete headers['Content-Length'];
+							}
 							
 							response.writeHead(code || 200, headers);
 							if (code && code === 304) {
