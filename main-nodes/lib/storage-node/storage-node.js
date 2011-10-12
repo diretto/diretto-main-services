@@ -88,15 +88,34 @@ module.exports = function(options) {
 		} ]
 	});
 
+	function _pad(val) {
+		if (parseInt(val, 10) < 10) {
+			val = '0' + val;
+		}
+		return val;
+	}
+	;
+
+	var httpDate = function rfc822(date) {
+		var months = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ];
+		var days = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
+		return days[date.getUTCDay()] + ', ' + _pad(date.getUTCDate()) + ' ' + months[date.getUTCMonth()] + ' ' + date.getUTCFullYear() + ' ' + _pad(date.getUTCHours()) + ':'
+				+ _pad(date.getUTCMinutes()) + ':' + _pad(date.getUTCSeconds()) + ' GMT';
+	};
+	
 	var _errorJSON = function(msg) {
 		return '{"error":"' + msg + '"}';
 	};
+	
+	
+	
 
 	var handleRequest = function(request, response) {
 
 		var headers = {
 			'Server' : SERVER_SIGNATURE,
-			'Content-Type' : "application/json"
+			'Content-Type' : "application/json",
+			'Date' : httpDate(new Date())
 		};
 
 		var requestUrl = url.parse(request.url, true);
