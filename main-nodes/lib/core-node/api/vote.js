@@ -325,7 +325,7 @@ module.exports = function(h) {
 			
 			h.util.dbFetcher.exist(resId.id, resId.type, function(code){
 				if(code === 404){
-					h.responses.error(404, "Votable resourcex not found ", res, next);
+					h.responses.error(404, "Votable resource not found ", res, next);
 				}
 				else if(code === 200){
 					
@@ -336,6 +336,18 @@ module.exports = function(h) {
 							}
 							else{
 								res.send(202);
+								
+								var resIdObj = {};
+								setResourceProperties(req, resIdObj);
+								
+								h.util.events.voteCasted({
+									userId : req.authenticatedUser,								
+									resource : resIdObj,
+									resourceType : voteDoc.resourceType,
+									vote : voteDoc.vote,
+									voteId : id								
+								});
+								
 								return next();
 							}
 						});						
@@ -350,8 +362,15 @@ module.exports = function(h) {
 							h.responses.error(500,"Internal server error.",res,next);
 						}
 						else{
-							voteDoc._rev = doc._rev;
-							save();
+							
+							if(voteDoc.vote === doc.vote){
+								res.send(202);
+								return next();
+							}
+							else{
+								voteDoc._rev = doc._rev;
+								save();
+							}
 						}
 					});
 				}
@@ -379,6 +398,18 @@ module.exports = function(h) {
 						}
 						else {
 							res.send(204);
+							
+							var resIdObj = {};
+							setResourceProperties(req, resIdObj);
+							console.dir(resIdObj);
+							
+							h.util.events.voteRemoved({
+								userId : req.authenticatedUser,								
+								resource : resIdObj,
+								resourceType : doc.resourceType,
+								voteId : id								
+							});
+							
 							return next();
 						}
 					});

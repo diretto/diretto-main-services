@@ -51,6 +51,17 @@ module.exports = function(h) {
 									}, {
 										'Location' : h.util.uri.documentLocation(documentId,lat,lon,variance)
 									});
+									
+									h.util.events.locationAdded({
+										userId : req.authenticatedUser,
+										documentId : documentId,
+										lat : lat,
+										lon : lon,
+										variance : variance,
+										id : locationDoc._id
+									});
+									
+									
 									return next();
 								}
 							});

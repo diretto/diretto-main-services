@@ -120,6 +120,10 @@ module.exports = function(h) {
 					}
 					else {
 						callback(null, successResponse);
+						
+						h.util.events.baseTagCreated({
+							baseTagId : tagId
+						});
 					}
 				});
 			}
@@ -344,6 +348,13 @@ module.exports = function(h) {
 													res.send(201, successResponse, {
 														'Location' : successUri
 													});
+													
+													
+													h.util.events.documentTagAppended({
+														tagId : baseTagId,
+														documentId : req.uriParams.documentId
+													});
+													
 													return next();
 												}
 											});		
@@ -425,6 +436,12 @@ module.exports = function(h) {
 													res.send(201, successResponse, {
 														'Location' : successUri
 													});
+													
+													h.util.events.linkTagAppended({
+														tagId : baseTagId,
+														linkId : req.uriParams.linkId
+													});
+													
 													return next();
 												}
 											});		

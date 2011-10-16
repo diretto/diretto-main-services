@@ -108,6 +108,13 @@ module.exports = function(h) {
 							}, {
 								'Location' : h.util.uri.link(linkId)
 							});
+							
+							h.util.events.linkCreated({
+								linkId : linkId,
+								sourceDocumentId : sourceId,
+								destinationDocumentId : destId
+							});
+							
 							return next();
 						}
 					});

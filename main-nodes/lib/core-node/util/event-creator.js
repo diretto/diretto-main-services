@@ -8,6 +8,17 @@ module.exports = function(h) {
 			COMMENT_CREATED : "COMMENT_CREATED",
 			DOCUMENT_CREATED : "DOCUMENT_CREATED", 
 			ATTACHMENT_CREATED : "ATTACHMENT_CREATED", 
+			DOCUMENT_TAG_APPENDED : "DOCUMENT_TAG_APPENDED", 
+			LINK_TAG_APPENDED : "LINK_TAG_APPENDED",
+			LINK_CREATED : "LINK_CREATED",
+
+			BASETAG_CREATED : "BASETAG_CREATED",
+
+			LOCATION_ADDED : "LOCATION_ADDED",
+			TIME_ADDED : "TIME_ADDED",
+			
+			VOTE_CASTED : "VOTE_CASTED",
+			VOTE_REMOVED : "VOTE_REMOVED"
 	};
 	
 	var noOp = function(){
@@ -30,6 +41,97 @@ module.exports = function(h) {
 			console.log(doc);
 			callback(err);
 		});
+	};
+	
+	var locationAdded = function(data){
+		if(data.documentId && data.lat && data.lon && data.variance && data.id){
+			storeEvent({
+				type : c.LOCATION_ADDED,
+				documentId : data.documentId,
+				lat : data.lat,
+				lon : data.lon,
+				variance : data.variance,
+				id : data.id,
+			}, noOp);
+		}
+	};
+	
+	var timeAdded = function(data){
+		if(data.documentId && data.after && data.before && data.id){
+			storeEvent({
+				type : c.TIME_ADDED,
+				documentId : data.documentId,
+				after : data.after,
+				before : data.before,
+				id : data.id,
+			}, noOp);
+		}
+	};
+	
+	var voteCasted = function(data){
+		if(data.resource && data.userId && data.vote && data.resourceType && data.voteId){
+			storeEvent({
+				type : c.VOTE_CASTED,
+				resource : data.resource,
+				userId : data.userId,
+				resourceType : data.resourceType,
+				vote : data.vote,
+				voteId : data.voteId,
+			}, noOp);
+		}
+	};
+		
+	var voteRemoved = function(data){
+		if(data.resource && data.userId && data.resourceType && data.voteId){
+			storeEvent({
+				type : c.VOTE_REMOVED,
+				resource : data.resource,
+				userId : data.userId,
+				resourceType : data.resourceType,
+				voteId : data.voteId,
+			}, noOp);
+		}
+	};
+	
+	
+	var baseTagCreated = function(data){
+		if(data.baseTagId){
+			storeEvent({
+				type : c.BASETAG_CREATED,
+				baseTagId : data.baseTagId
+			}, noOp);
+		}
+	};
+	
+	var linkCreated = function(data){
+		if(data.linkId && data.sourceDocumentId && data.destinationDocumentId){
+			storeEvent({
+				type : c.LINK_CREATED,
+				linkId : data.linkId,
+				sourceDocumentId : data.sourceDocumentId,
+				destinationDocumentId : data.destinationDocumentId,
+			}, noOp);
+		}
+	};
+	
+	var linkTagAppended = function(data){
+		if(data.tagId && data.linkId){
+			storeEvent({
+				type : c.LINK_TAG_APPENDED,
+				tagId : data.tagId,
+				linkId : data.linkId
+			}, noOp);
+		}
+	};	
+	
+	var documentTagAppended = function(data){
+		if(data.tagId && data.documentId){
+			storeEvent({
+				type : c.DOCUMENT_TAG_APPENDED,
+				tagId : data.tagId,
+				documentId : data.documentId
+			}, noOp);
+		}
 	};
 	
 
@@ -101,6 +203,19 @@ module.exports = function(h) {
 		
 		keySet : keySet,
 		keyRemoved : keyRemoved,
+		
+		documentTagAppended : documentTagAppended,
+		linkTagAppended : linkTagAppended,
+		
+		linkCreated : linkCreated,
+		
+		baseTagCreated : baseTagCreated,
+		
+		voteCasted : voteCasted,
+		voteRemoved : voteRemoved,
+		
+		locationAdded  : locationAdded,
+		timeAdded : timeAdded,
 		 
 	};
 }

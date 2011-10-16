@@ -292,6 +292,23 @@ module.exports = function(h) {
 									mimeType : data.mimeType
 								});
 								
+								h.util.events.locationAdded({
+									documentId : docId,
+									lat : locationDoc.lat,
+									lon : locationDoc.lon,
+									variance : locationDoc.variance,
+									id : locationDoc._id
+								});
+								
+								h.util.events.timeAdded({
+									documentId : docId,
+									before : timeDoc.before,
+									after : timeDoc.after,
+									id : timeDoc._id
+								});
+								
+
+								
 								return next();
 							});
 						}

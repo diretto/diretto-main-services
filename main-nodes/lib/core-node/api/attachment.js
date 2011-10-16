@@ -193,7 +193,26 @@ module.exports = function(h) {
 										documentId : documentId,
 										attachemntId : attachmentId,
 										mimeType : doc.mimeType
-									});									
+									});		
+									
+									//add time, loc event via snapshot document
+									h.util.dbFetcher.fetch(documentId, h.c.SNAPSHOT, function(err, snapshotDoc) {
+										if (!err) {											
+											h.util.events.locationAdded({
+												documentId : documentId,
+												lat : snapshotDoc.location.lat,
+												lon : snapshotDoc.location.lon,
+												variance : snapshotDoc.location.variance,
+												id : snapshotDoc.location.id
+											});											
+											h.util.events.timeAdded({
+												documentId : documentId,
+												before : snapshotDoc.time.before,
+												after : snapshotDoc.time.after,
+												id : snapshotDoc.time.id
+											});											
+										}
+									});
 									
 									return next();
 								}

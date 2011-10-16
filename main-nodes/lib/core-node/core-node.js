@@ -146,6 +146,7 @@ module.exports = function(options) {
 	apiHelper['util']['dbFetcher'] = require('./util/db-fetcher.js')(apiHelper); 
 	apiHelper['util']['commonValidator'] = require('./util/common-validator.js')(apiHelper); 
 	apiHelper['util']['renderer'] = require('./util/resource-renderer.js')(apiHelper); 
+	apiHelper['util']['updater'] = require('./util/wrapped-update-handler.js')(apiHelper); 
 	apiHelper['util']['events'] = require('./util/event-creator.js')(apiHelper); 
 	
 	

@@ -56,6 +56,14 @@ module.exports = function(h) {
 									}, {
 										'Location' : h.util.uri.documentTime(documentId,after,before)
 									});
+									
+									h.util.events.timeAdded({
+										documentId : documentId,
+										before : timeDoc.before,
+										after : timeDoc.after,
+										id : timeDoc._id
+									});
+									
 									return next();
 								}
 							});
