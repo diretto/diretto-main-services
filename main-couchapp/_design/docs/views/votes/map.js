@@ -1,3 +1,12 @@
+/**
+ * List of votes by resource. The value is a number representing the vote (1: up, -1: down).
+ * 
+ * Can be used with a builtin reduce function to in order to calculate the numbers of total votes, up votes, down votes
+ * as a single grouped result.
+ *
+ * @author Benjamin Erb
+ */
+
 function(doc) {
 	if(doc.type === "vote"){
 	

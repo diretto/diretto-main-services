@@ -1,5 +1,5 @@
 /**
- * Updates the time entry, if changed.
+ * Updates the time entry of a snapshot, if changed.
  * 
  * @author Benjamin Erb
  */

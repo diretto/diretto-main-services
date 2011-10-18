@@ -1,3 +1,9 @@
+/**
+ * List of attachments and comments by document.
+ *
+ * @author Benjamin Erb
+ */
+
 function(doc) {
 	if(doc.type === "attachment"  && doc.enabled){
 		emit([doc.documentId, doc.publishedTime, "attachment", doc.attachmentId], null);

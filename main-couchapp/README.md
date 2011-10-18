@@ -1,7 +1,8 @@
 # CouchApp for CouchDB-based persistence layer of diretto main API services
 
-## Document Types
+The application is divided into three independent CouchApps, which should be deployed to the same database: 
 
-### Documents
-Prefix: d
-Type: document
+ - docs => main CouchApp
+ - users => user management
+ - events => internal event message sourcing
+

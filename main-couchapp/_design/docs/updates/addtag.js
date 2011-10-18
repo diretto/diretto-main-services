@@ -1,5 +1,5 @@
 /**
- * Adds a tag to the snapshot document
+ * Adds a tag to the snapshot document, if not yet set.
  * 
  * @author Benjamin Erb
  */

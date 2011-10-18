@@ -1,6 +1,10 @@
 /**
+ * Generates a flat view of document-related entries, based on the snapshot values. 
+ *
+ *
  * @author Benjamin Erb
  */
+
 function(doc) {
 
 	  if (doc.type === "snapshot") {

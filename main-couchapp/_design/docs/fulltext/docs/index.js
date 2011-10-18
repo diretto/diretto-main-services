@@ -1,4 +1,10 @@
-
+/**
+ * Complex fti index for lucene queries.
+ * 
+ * Allows to search by publish time, spatial/temporal origin and tags.  
+ * 
+ * @author Benjamin Erb
+ */
 
 function (doc) {
 	
@@ -32,8 +38,7 @@ function (doc) {
 			doc.tags.forEach(function(tag){
 				  ret.add(tag,{"field":"tags","type":"string", "store": store});
 			});
-		 }
-		
+		 }		
 		
 		return ret; 
 	}

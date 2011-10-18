@@ -1,5 +1,5 @@
 /**
- * Updates the location entry, if changed.
+ * Updates the location entry of a snapshot, if changed.
  * 
  * @author Benjamin Erb
  */
