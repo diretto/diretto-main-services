@@ -8,14 +8,19 @@ A node.js-based implementation of the following diretto platform services:
 
 ## Installation Guide
 
-The setup of the task service implementation is similar to the setup of the main platform services. It requires: 
+The setup of the main services implementation requires: 
 
  - latest node.js 0.4.x
  - no NPM (self-contained dependencies)
  - CouchDB with CouchDB-Lucene extension
 
+First, the CouchApps inside main-couchapp/ must be deployed to your CouchDB server that will power your instance. 
+There is a helper script to deploy all three CouchApps together. The default database name is  `diretto_main`.
 
-tbd.
+Next, go to the main-nodes/conf/ directory and change the settings according to your deployment parameters. 
+
+Then, the services can be started. Note that the Core API service must be started as last service, as it is checking
+other services to run for adding them into its registry. 
 
 ## License (not valid for `diretto-main-nodes/main-nodes/vendor/`)
 
