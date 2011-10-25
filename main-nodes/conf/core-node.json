@@ -4,11 +4,12 @@
 		"port" : "8001"
 	},
 	"auth" : {
-		"plugin" : "auth-basic-dummy"
+		"plugin" : "auth-basic-couchdb"
 	},
 	"parameters" : {
 		"paginationSize" : 20,
-		"batchLimit" : 50
+		"batchLimit" : 50,
+		"maxValueLength" : 1024
 	},
 	"persistence" : {
 		"couchdb":{
@@ -20,8 +21,8 @@
 	"allowNewUsers" : true,
     "deployment": {
     	"title":"diretto v2 Core Dev Instance",
-    	"website":"http://www.diretto.org",
-    	"contact":"mail@diretto.org"
+    	"website":"http://foo.bar",
+    	"contact":"mail@foo.bar"
     },
-    "registry" : ["http://task.diretto.org/v2"]
+    "registry" : ["http://task.foo.bar/v2"]
 }

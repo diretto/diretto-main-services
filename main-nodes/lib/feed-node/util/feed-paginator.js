@@ -1,3 +1,11 @@
+/**
+ * Helper function for paginating view results.
+ * 
+ * @author Benjamin Erb
+ * 
+ */
+
+
 require("rfc3339date");
 var barrierpoints = require('barrierpoints');
 
@@ -21,12 +29,9 @@ module.exports = function(db) {
 		});
 
 		var endKey = (rangeKey || []).slice(0);
-//		endKey.push({});
-		
 
 		var startKey = cursor;
 		
-
 		
 		// fetch page to result.list
 		db.view(view, {
@@ -42,8 +47,6 @@ module.exports = function(db) {
 				});
 			}
 			else {
-				
-//				console.dir(dbRes);
 				
 				if (dbRes.length > 0) {
 					var i = 0;

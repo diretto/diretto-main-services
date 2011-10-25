@@ -1,3 +1,9 @@
+/**
+ * Query Handler
+ * 
+ * @author Benjamin Erb
+ */
+
 require("rfc3339date");
 
 var qstring = require('querystring');

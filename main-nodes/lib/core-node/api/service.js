@@ -1,3 +1,9 @@
+/**
+ * Service Handler
+ * 
+ * @author Benjamin Erb
+ */
+
 module.exports = function(h) {
 
 	var mediatypes = {

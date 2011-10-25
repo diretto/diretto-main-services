@@ -3,7 +3,7 @@ var http = require('http');
 var util = require('util');
 
 /**
- * A plugin for YouTube Links
+ * A demo plugin for YouTube Links.
  * 
  * @author Benjamin Erb
  */

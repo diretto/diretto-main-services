@@ -1,5 +1,3 @@
-var crypto = require('crypto');
-
 /**
  * Simple HMAC calculation that signs incoming uploads and 
  * upload verification responses. Used for communication-less
@@ -9,6 +7,9 @@ var crypto = require('crypto');
  * 
  * @author Benjamin Erb
  */
+
+var crypto = require('crypto');
+
 module.exports = function(salt) {
 
 	var DELIMITER = ":";
@@ -19,7 +20,7 @@ module.exports = function(salt) {
 		var hmac = crypto.createHmac("sha1", salt);
 		hmac.update(s);
 		var result = hmac.digest('hex');
-		//use a callback, maybe this will be replaced in the future with a more async func
+		//use a callback, this may replaced with a more async func in the future 
 		callback(null, result);
 	};
 
@@ -27,7 +28,7 @@ module.exports = function(salt) {
 		var hmac = crypto.createHmac("sha1", salt);
 		hmac.update(statuscode + DELIMITER + username + DELIMITER + path);
 		var result = hmac.digest('hex');
-		//use a callback, maybe this will be replaced in the future with a more async func
+		//use a callback, this may replaced with a more async func in the future 
 		callback(null, result);
 	};
 

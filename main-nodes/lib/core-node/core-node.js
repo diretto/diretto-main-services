@@ -1,3 +1,9 @@
+/**
+ * Core Node
+ * 
+ * @author Benjamin Erb
+ * 
+ */
 var path = require('path');
 
 var uuid = require('node-uuid');
@@ -16,14 +22,12 @@ module.exports = function(options) {
 
 	options.server = {
 		name : "diretto Core API Node",
-		version : "0.1.0",
-		signature : "diretto Core API Node/0.1.0"
+		version : "0.2.0",
+		signature : "diretto Core API Node/0.2.0"
 	}
 
 	// TODO fix screwed baseUri options.task.external.uri => foobar/v2 !
 
-//	console.dir(options);
-	
 	var signer = Signer(options.common.security.salt);
 
 	var plugin = new PluginHandler();

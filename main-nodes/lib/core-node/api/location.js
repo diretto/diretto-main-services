@@ -1,3 +1,10 @@
+/**
+ * Location Handler
+ * 
+ * @author Benjamin Erb
+ */
+
+
 require("rfc3339date");
 
 module.exports = function(h) {

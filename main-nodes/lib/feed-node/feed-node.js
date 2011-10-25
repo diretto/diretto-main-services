@@ -1,4 +1,9 @@
-var path = require('path');
+/**
+ * Feed Node
+ * 
+ * @author Benjamin Erb
+ * 
+ */var path = require('path');
 
 var uuid = require('node-uuid');
 var restify = require('node-restify');

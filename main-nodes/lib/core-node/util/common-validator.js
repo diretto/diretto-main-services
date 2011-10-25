@@ -1,3 +1,9 @@
+/**
+ * Collection of validation functions used by several API call handlers
+ * 
+ * @author Benjamin Erb
+ */
+
 require("rfc3339date");
 
 module.exports = function(h) {

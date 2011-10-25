@@ -1,3 +1,10 @@
+/**
+ * Provides functions for creating persisting events.
+ * 
+ * @author Benjamin Erb
+ */
+
+
 require("rfc3339date");
 
 module.exports = function(h) {

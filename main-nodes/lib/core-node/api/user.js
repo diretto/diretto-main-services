@@ -1,3 +1,9 @@
+/**
+ * User Handler
+ * 
+ * @author Benjamin Erb
+ */
+
 require("rfc3339date");
 var crypto = require('crypto');
 

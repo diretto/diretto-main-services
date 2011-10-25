@@ -1,3 +1,9 @@
+/**
+ * Helper functions for update handler requests. Handles retries internally.
+ * 
+ * @author Benjamin Erb
+ */
+
 module.exports = function(h) {
 	
 	var db = h.db;

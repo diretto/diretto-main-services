@@ -1,9 +1,13 @@
-require("rfc3339date");
-
 /**
  * An asynchronous updater for snapshot documents based on changes on:
- *  tags appended, new location, new time, vote for location and vote for time 
+ *  tags appended, new location, new time, vote for location and vote for time
+ *  
+ *   @author Benjamin Erb
  */
+
+require("rfc3339date");
+
+
 module.exports = function(h, eventEmitter) {
 
 

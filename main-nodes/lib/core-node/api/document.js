@@ -1,3 +1,9 @@
+/**
+ * Document Handler
+ * 
+ * @author Benjamin Erb
+ */
+
 require("rfc3339date");
 var barrierpoints = require('barrierpoints');
 

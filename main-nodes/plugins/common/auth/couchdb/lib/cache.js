@@ -10,7 +10,7 @@
  * prevents the usage of too old entries and allows some efficient caching between distributed nodes sharing 
  * authentication data.   
  * 
- * @author Benjamin Erb | http://www.benjamin-erb.de
+ * @author Benjamin Erb
  *  
  */
 

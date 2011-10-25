@@ -1,3 +1,9 @@
+/**
+ * Link Handler
+ * 
+ * @author Benjamin Erb
+ */
+
 var barrierpoints = require('barrierpoints');
 
 module.exports = function(h) {

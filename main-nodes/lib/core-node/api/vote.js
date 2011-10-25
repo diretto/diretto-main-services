@@ -1,3 +1,9 @@
+/**
+ * Vote Handler
+ * 
+ * @author Benjamin Erb
+ */
+
 module.exports = function(h) {
 
 	/**

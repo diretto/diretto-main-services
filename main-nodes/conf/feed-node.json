@@ -1,6 +1,6 @@
 {
 	"bind" : {
-		"ip" : "127.0.0.1", 
+		"ip" : "0.0.0.0", 
 		"port" : "8002"
 	},
 	"parameters" : {
@@ -8,7 +8,7 @@
 		"maxResults" : 500
 	},
 	"hub" : {
-		"uri" : "http://hub/"
+		"uri" : "http://hub.foo.bar/"
 	},
 	"persistence" : {
 		"couchdb":{
@@ -17,10 +17,9 @@
 			"table" : "diretto_main"			
 		}
 	},
-	"allowNewUsers" : true,
     "deployment": {
     	"title":"diretto v2 Feed Dev Instance",
-    	"website":"http://www.diretto.org",
-    	"contact":"mail@diretto.org"
+    	"website":"http://foo.bar",
+    	"contact":"mail@foo.bar"
     }
 }

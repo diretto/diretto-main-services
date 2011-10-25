@@ -1,3 +1,10 @@
+/**
+ * Atom Feed Handler
+ * 
+ * @author Benjamin Erb
+ * 
+ */
+
 var fs = require('fs');
 var path = require('path');
 

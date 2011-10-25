@@ -1,3 +1,9 @@
+/**
+ * Helper functions for query views using pagination.
+ * 
+ * @author Benjamin Erb
+ */
+
 require("rfc3339date");
 var barrierpoints = require('barrierpoints');
 

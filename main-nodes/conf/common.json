@@ -1,15 +1,15 @@
 {
 	"endpoints": {
-		"core" : "http://localhost:8001/v2",
-		"feed" : "http://feed.diretto.org/v2",
-		"storage" : "http://media.diretto.org/v2"
+		"core" : "http://foo.bar:8001/v2",
+		"feed" : "http://foo.bar:8002/v2",
+		"storage" : "http://foo.bar:8000/"
 	},
 	"security" : {
 		"salt" : "6K5817EXZ21TYBVFYGVA"
 	},
     "deployment": {
     	"title":"diretto v2 Dev",
-    	"website":"http://www.diretto.org",
-    	"contact":"mail@diretto.org"
+    	"website":"http://foo.bar",
+    	"contact":"nono@foo.bar"
     }	
 } 

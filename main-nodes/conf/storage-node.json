@@ -4,7 +4,7 @@
 		"port" : "8000"
 	},
 	"storage" : {
-		"backend" : "storage-node-fs-backend",
+		"backend" : "storage-node-couchdb-backend",
 		"tmpDir" : "/tmp/"
 	},
 	"auth" : {

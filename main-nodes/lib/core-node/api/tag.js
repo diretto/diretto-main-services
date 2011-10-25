@@ -1,3 +1,9 @@
+/**
+ * Tag Handler
+ * 
+ * @author Benjamin Erb
+ */
+
 var crypto = require('crypto');
 
 var barrierpoints = require('barrierpoints');

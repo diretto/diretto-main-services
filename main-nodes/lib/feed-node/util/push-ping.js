@@ -1,9 +1,13 @@
+/**
+ * A wrapper that consumes _changes events and pings the hub.
+ * 
+ * @author Benjamin Erb
+ * 
+ */
+
 var querystring = require('querystring');
 var request = require('request')
 
-/**
- * A wrapper that consumes _changes events and pings the hub.
- */
 module.exports = function(h, eventEmitter) {
 
 	var pingHub = function(feedUri) {

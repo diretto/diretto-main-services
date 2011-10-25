@@ -3,7 +3,7 @@ exports.config = {
 //			host : "api.diretto.org",
 			host : "localhost",
 			port : 5984,
-			database : "users",
+			database : "diretto_main",
 			poolsize : 4
 		},
 		cache : {

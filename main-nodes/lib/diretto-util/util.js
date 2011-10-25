@@ -1,3 +1,9 @@
+/**
+ * Common functions.
+ * 
+ * @author Benjamin Erb
+ */
+
 var fs = require('fs');
 
 /**

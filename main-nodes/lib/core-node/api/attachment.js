@@ -1,3 +1,9 @@
+/**
+ * Attachment Handler
+ * 
+ * @author Benjamin Erb
+ */
+
 module.exports = function(h) {
 
 	return {

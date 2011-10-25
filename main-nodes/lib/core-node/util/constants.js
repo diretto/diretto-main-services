@@ -1,3 +1,9 @@
+/**
+ * Database document constants.
+ * 
+ * @author Benjamin Erb
+ */
+
 module.exports = (function() {
 	
 	var DELIMITER = "-";

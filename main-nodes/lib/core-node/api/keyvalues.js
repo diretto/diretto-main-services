@@ -1,3 +1,9 @@
+/**
+ * Key/Values Handler
+ * 
+ * @author Benjamin Erb
+ */
+
 module.exports = function(h) {
 	
 	var MIN_KEY_LENGTH = 3;

@@ -1,11 +1,12 @@
 /**
  * A helper object that generates resource URIs using the v2 URI templates.
+ * 
+ * @author Benjamin Erb
+ * 
  */
 module.exports = function(baseUri){
 	
 	var builder = function(p){
-		
-//		console.dir(p);
 		
 		if(p.documentId && p.commentId){
 			return  baseUri+"/document/"+p.documentId+"/comment/"+p.commentId;

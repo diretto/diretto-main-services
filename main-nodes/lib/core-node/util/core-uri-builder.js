@@ -1,5 +1,8 @@
 /**
  * A helper object that generates resource URIs using the v2 URI templates.
+ * 
+ * @author Benjamin Erb
+ * 
  */
 module.exports = function(baseUri){
 	

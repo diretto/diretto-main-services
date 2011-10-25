@@ -1,3 +1,10 @@
+/**
+ * Glue code that generates events from CouchDB listener callbacks. 
+ * 
+ * @author Benjamin Erb
+ * 
+ */
+
 var follow = require('follow');
 var events = require('events');
 

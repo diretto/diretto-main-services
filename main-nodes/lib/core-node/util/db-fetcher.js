@@ -1,3 +1,9 @@
+/**
+ * Helper functions for common database requests. 
+ * 
+ * @author Benjamin Erb
+ */
+
 var barrierpoints = require('barrierpoints');
 
 module.exports = function(h) {

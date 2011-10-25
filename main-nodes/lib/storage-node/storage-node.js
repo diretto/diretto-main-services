@@ -1,3 +1,10 @@
+/**
+ * Storage Node 
+ * 
+ * @author Benjamin Erb
+ * 
+ */
+
 var path = require('path');
 var util = require('util');
 var http = require('http');

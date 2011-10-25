@@ -1,3 +1,10 @@
+/**
+ * Set of resource rendering functions. A render function takes raw database JSON and converts it 
+ * JSON structs as defined by the diretto API.
+ * 
+ * @author Benjamin Erb
+ */
+
 module.exports = function(h) {
 	
 	var location = function(l){
