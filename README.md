@@ -1,4 +1,4 @@
-# diretto Main Service
+# diretto Main Services
 
 A node.js-based implementation of the following diretto platform services: 
 
